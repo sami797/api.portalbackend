@@ -1,0 +1,17 @@
+server { 
+    listen [::]:80;
+    listen 80;
+    server_name abudhabiapprovals.ae;
+    return 301 https://www.abudhabiapprovals.ae$request_uri;            
+}
+
+server {
+    listen [::]:80;
+    listen 80;
+    server_name www.abudhabiapprovals.ae;
+    root /var/www/html/abudhabiapprovals.ae;
+    location / {
+        proxy_pass http://127.0.0.1:5007;
+        #try_files $uri $uri/ /default/index.html =404;
+    }
+}

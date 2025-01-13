@@ -1,0 +1,202 @@
+<style>
+    
+body{
+    background-color: #f2f2f2;
+    margin: 0;
+    padding: 0;
+}
+
+.body-wrapper{
+    display: flex;
+    flex-wrap: nowrap;
+    height: 100vh;
+    width: 100%;
+}
+
+.form-wrapper,.result-wrapper{
+    width: 50%;
+    max-height: 100vh;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.content-padding{
+    padding: 80px 50px;
+}
+
+form{
+    background-color: white;
+    padding: 20px 10px;
+    border-radius: 10px;
+}
+
+.form-wrapper .form-design{
+    display: block;
+    width: 100%;
+    border: 1px solid #ddd;
+    background-color: white;
+    padding: 15px 20px;
+    font-size: 14px;
+    color: black;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+.form-wrapper .form-design::placeholder{
+    color: #555;
+}
+.result-wrapper{
+    background-color: white;
+    border-left: 2px solid #555;
+}
+
+.buttonDesign{
+    background-color: #00467F;
+    color: white;
+    padding: 10px 10px;
+    min-width: 150px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.buttonDesign:disabled{
+    cursor: progress;
+    opacity: 0.5;
+}
+
+.small-icon{
+    height: 20px;
+    width: 20px;
+}
+
+.header{
+    background-color: #f2f2f2;
+    padding: 5px 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.header .title{
+    margin: auto 10px;
+}
+.copyJSON{
+    margin: auto 10px;
+    cursor: pointer;
+}
+.responseData{
+    border: 1px solid #f2f2f2;
+}
+
+.ResponseContainer{
+    max-height: 80vh;
+    padding: 10px;
+    min-height: 80vh;
+    overflow: scroll;
+}
+</style>
+<div class="body-wrapper">
+    <div class="form-wrapper">
+        <div class="content-padding">
+            <form action="#" onsubmit="event.preventDefault(); makeSmartDubaiApiRequest()">
+                <select class="form-design" name="requestType" id="requestType" required>
+                    <option value="GET">GET</option>
+                    <option value="PUT">PUT</option>
+                    <option value="POST">POST</option>
+                </select>
+                <!-- value="https://api.dubaipulse.gov.ae/"  -->
+                <input class="form-design" placeholder="Enter URL" 
+                value="https://api.dubaipulse.gov.ae/open/dld/"
+                name="url" id="url" required>
+                <textarea rows="5" class="form-design" placeholder="Enter Auth Token" id="auth"></textarea>
+                <select class="form-design" id="content_type">
+                    <option value="application/x-www-form-urlencoded" selected>application/x-www-form-urlencoded</option>
+                    <option value="application/json">application/json</option>
+                </select>
+                <textarea rows="5" class="form-design" placeholder="Enter Body : JSON format" id="bodyData"></textarea>
+                <button class="buttonDesign" id="submitButton" type="submit">MAKE REQUEST</button>
+            </form>
+        </div>
+    </div>
+    <div class="result-wrapper">
+       <div class="content-padding">
+        <div class="responseData">
+            <div class="header">
+                <span class="title">
+                    Response Data
+                </span>
+    
+            <div class="copyJSON" onClick="copyToClipBoard()">
+                <svg class="small-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><defs><style>.fa-secondary{opacity:.4}</style></defs><path class="fa-primary" d="M192 352V128h-144c-26.51 0-48 21.49-48 48v288c0 26.51 21.49 48 48 48h192c26.51 0 48-21.49 48-48L288 416h-32C220.7 416 192 387.3 192 352zM416 0v96h96L416 0z"/><path class="fa-secondary" d="M512 96v240c0 26.51-21.49 48-48 48h-192c-26.51 0-48-21.49-48-48v-288c0-26.51 21.49-48 48-48H416v96H512z"/></svg>
+                <span style="padding-left: 10px" id="copied">Copy to Clipboard</span>
+            </div>
+            </div>
+            <pre style="margin:0" class="ResponseContainer"><code id="response"></code></pre>
+    </div>
+       </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    function makeSmartDubaiApiRequest(e){
+        let url = document.getElementById("url").value;
+        let auth =  document.getElementById("auth").value;
+        let requestType =  document.getElementById("requestType").value;
+        let requestBody =  document.getElementById("bodyData").value;
+        let contentType = document.getElementById("content_type").value;
+        let submitButton = document.getElementById('submitButton');
+        submitButton.innerHTML = "Loading...";
+        submitButton.disabled = true;
+        axios({
+            url: '/smart-dubai/fetchData',
+            method: 'POST',
+            data: {
+                url: url,
+                requestType: requestType,
+                auth: auth,
+                contentType: contentType,
+                requestBody: (requestBody)? requestBody: {}
+            },
+        }).then(resp => {
+            if(url.includes("grant_type=client_credentials")){
+                localStorage.setItem('AUTH_CODE', resp.data.access_token);
+            }
+            document.getElementById("response").innerHTML = JSON.stringify(resp.data, undefined, 2);
+            submitButton.innerHTML = "Submit";
+            submitButton.disabled = false;
+        }).catch(err => {
+            submitButton.innerHTML = "Submit";
+            document.getElementById("response").innerHTML = err.message;
+            submitButton.disabled = false;
+            console.log(err.message);
+        })
+    }
+
+    function populateAuthCode(){
+        let authCode = localStorage.getItem('AUTH_CODE')
+        document.getElementById("auth").value = authCode;
+    }
+
+    function copy() {
+        let text = document.getElementById("response").innerHTML;
+        var input = document.createElement('input');
+        input.setAttribute('value', text);
+        document.body.appendChild(input);
+        input.select();
+        var result = document.execCommand('copy');
+        document.body.removeChild(input);
+        return result;
+    }
+
+    function copyToClipBoard(){
+        copy()
+        document.getElementById("copied").innerHTML = "Copied";
+        setTimeout(()=>{
+            document.getElementById("copied").innerHTML = "Copy to clipoard";
+        }, 3000)
+    }
+
+    populateAuthCode();
+
+</script>

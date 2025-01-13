@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    Invoice <%= invoice?.invoiceNumber %>
+  </title>
+
+  <link rel="stylesheet" type="text/css" hs-webfonts="true"
+    href="https://fonts.googleapis.com/css?family=Lato|Lato:i,b,bi">
+  <meta property="og:title" content=" DAT Invoice">
+
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style type="text/css">
+    h2 {
+      font-size: 40px;
+      font-weight: 900;
+      margin: 0;
+      padding: 0;
+    }
+
+    h3 {
+      font-size: 24px;
+      font-weight: 900;
+      margin: 0;
+      padding: 0;
+    }
+
+    h5 {
+      font-size: 18px;
+      font-weight: 900;
+      margin: 0;
+      padding: 0;
+    }
+
+    p {
+      font-size: 16px;
+      margin: 0;
+      padding: 0;
+    }
+
+    td {
+      vertical-align: top;
+    }
+
+    #email {
+      margin: auto;
+      width: 1024px;
+      background-color: white;
+    }
+
+    #tableHeader,
+    th {
+      border-bottom: 1px solid #000000;
+    }
+
+    .tableFooter {
+      border-bottom: 1px solid #000000;
+      border-top: 1px solid #c0c0c0;
+      padding: 10px 0px;
+    }
+
+    .table-items p {
+      padding: 4px 0px
+    }
+  </style>
+</head>
+
+<body bgcolor="#F5F8FA"
+  style="width: 100%; margin: auto 0; padding:0; font-family:Lato, sans-serif; word-break:break-word">
+  <div id="email">
+    <!--DAT Logo-->
+    <img alt="DAT Logo"
+      src="https://resources.projects.datconsultancy.com/public/organization/2023-08-01/datt-1690892367374.jpg"
+      width="70px" align="right" style="padding-right: 20px;">
+
+    <table role="presentation" border="0" cellpadding="0" cellspacing="10px" style="width: 100%; padding: 0px 20px;">
+      <tr>
+        <td style="width: 60%;">
+          <h2>INVOICE</h2>
+          <!--Company Name-->
+          <p style="padding-left: 10px">
+           <%= clientData?.name %>
+          </p>
+        </td>
+
+        <td>
+          <!--Date-->
+          <h5>Invoice Date</h5>
+          <p><%= convertDate(invoice.issueDate) %></p>
+          <% if(invoice.expiryDate){ %>
+          <h5>Due Date</h5>
+          <p><%= convertDate(invoice.expiryDate) %></p>
+          <% } %>
+          <!--Invoice Number-->
+          <h5 style="padding-top: 10px;">Invoice Number</h5>
+          <p><%= invoice?.invoiceNumber %></p>
+          <!--Reference-->
+          <h5 style="padding-top: 10px;">Reference</h5>
+          <p><%= invoice?.Quotation?.quoteNumber %></p>
+        </td>
+
+        <!--Luxedesign Address-->
+        <td style="width: 20%;">
+          <h5>
+            <%= submissionBy?.name %>
+          </h5>
+          <p>
+            <%= submissionBy?.address %>
+              <br />
+          </p>
+
+          <!--TRN No.-->
+          <h5 style="padding-top: 10px;">TRN No.</h5>
+          <p>
+            <%= submissionBy?.taxRegistrationNumber %>
+          </p>
+        </td>
+      </tr>
+    </table>
+
+    <!-- Details Breakdown -->
+    <table width="100%" style="margin-top: 20px; padding: 0px 20px;" cellspacing="0px">
+      <thead>
+        <tr>
+          <th class="tableHeader" style="width: 50%;" align="left">Description</th>
+          <th class="tableHeader" align="right">Quantity</th>
+          <th class="tableHeader" align="right">Unit Price</th>
+          <th class="tableHeader" align="right">Amount AED</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% invoice?.InvoiceItems.forEach((ele)=> { %>
+          <tr>
+            <td style="padding-bottom: 10px;" class="table-items">
+              <div style="white-space: pre-line;"><%= ele.title %></div>
+            </td>
+            <td align="right"><%= ele.quantity %></td>
+            <td align="center">
+              <% 
+              let itemTotal = ele.amount * ele.quantity;
+              %>
+              <%= ele.amount %>
+            </td>
+            <td align="right">
+              <%= itemTotal %>
+            </td>
+          </tr>
+          <% }) %>
+      </tbody>
+
+      <tfoot>
+        <tr style="width: 100%;" align="right">
+          <td></td>
+          <td></td>
+          <td style="text-align: left;">Subtotal</td>
+          <td colspan="1"><%= invoice.subTotal %></td>
+        </tr>
+        <% taxData.forEach(([key, ele]) => { %>
+          <tr style="width: 100%;" align="right">
+            <td></td>
+            <td></td>
+            <td style="text-align: left;"><%= `${ele.title} (${ele.rate}%)` %></td>
+            <td colspan="1"><%= ele.totalTax.toFixed(2) %></td>
+          </tr>
+          <% }) %>
+        <tr style="width: 100%;" align="right">
+          <td></td>
+          <td></td>
+          <td style="font-weight: bold; text-align: left; border-top: 2px solid black; border-bottom: 2px solid black; padding: 5px 0px;">TOTAL</td>
+          <td style="font-weight: bold; border-top: 2px solid black; border-bottom: 2px solid black;padding: 5px 0px;"><%= invoice.total.toFixed(2) %> AED</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <!--Due Date -->
+    <table role="presentation" width="100%" style="margin-top: 50px;">
+      <tr>
+        <td align="left" style="padding-left: 20px">
+          <p>To: <%= submissionBy?.bankAccountHolderName %></p>
+          <p>Account Number: <%= submissionBy?.bankAccountNumber %></p>
+          <p>IBAN: <%= submissionBy?.bankIBAN %></p>
+          <p>Bank Name: <%= submissionBy?.bankName %></p>
+          <p>Swift Code: <%= submissionBy?.bankSwiftCode %></p>
+        </td>
+      </tr>
+    </table>
+
+    <table role="presentation" width="100%" style="padding: 0px 20px;">
+      <!--Scissors Image-->
+      <tr>
+        <td align="left" style="width: 100%;">
+          <img alt="Scissors" src="<%= process.env.IMAGE_CDN_URL %>public/email-templates/scissors.png" width="100%" style=" padding-top: 20px;">
+        </td>
+      </tr>
+    </table>
+
+    <!--Payment Advice-->
+    <table role="presentation" width="100%" style="padding: 0px 20px;">
+      <tr>
+        <td style="width: 55%;">
+          <h2>PAYMENT ADVICE</h2>
+          <p style="padding-left: 50px">
+            To: <%= submissionBy?.bankAccountHolderName %>
+          </p>
+          <p style="padding-left: 74px">
+            <%= submissionBy?.address %>
+          </p>
+        </td>
+
+        <td style="width: 100%;">
+          <table>
+            <tr>
+              <td>
+                <h5>Customer</h5>
+              </td>
+              <td style="width: 70%;">
+                <%= clientData?.name %>
+                <p><%= clientData?.email %></p>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="white-space: nowrap;">
+                <h5>Invoice Number</h5>
+              </td>
+              <td style="width: 70%;">
+                <%= invoice?.invoiceNumber %>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <h5>Amount Due</h5>
+              </td>
+              <td style="width: 70%;">
+                <h5><%= invoice.total.toFixed(2) %> AED</h5>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <h5>Due Date</h5>
+              </td>
+              <td style="width: 70%;">
+                <%= convertDate(invoice?.expiryDate) %>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <!--Page footer-->
+    <table role="presentation" width="100%" align="bottom" style="padding: 20px; font-size: 12px;">
+      <tr>
+        <td>
+          Registered Office: <%= submissionBy?.address %>
+        </td>
+      </tr>
+    </table>
+  </div>
+</body>
+
+</html>

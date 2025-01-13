@@ -1,0 +1,87 @@
+<%- include("layout/email-header") -%>
+<style>
+
+    .message-container {
+        display: block;
+        margin: 10px auto;
+        min-height: 300px;
+        padding: 20px 15px;
+    }
+
+    .otp-block{
+        text-align: center;
+        display: block;
+        font-size: 32px;
+        font-weight: 600;
+        color: rgb(19, 119, 72);
+        letter-spacing: 5px;
+    }
+
+    .text{
+    color: rgba(89, 89, 89, 1);
+    font-size: 14px;
+    margin: 0;
+    line-height: 1.8;
+    font-weight: unset;
+    }
+
+    .text-left{
+        text-align: left;
+    }
+
+    table td, table th{
+        padding-bottom: 1em;
+    }
+
+    .link-button{
+        background-color: rgba(19, 119, 72, 1);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        font-size: small;
+        text-decoration: none;
+    }
+</style>
+<div class="message-wrapper">
+    <div class="message-container">
+        <p class="text">Hi <%= firstName %>,</p>
+        <p class="text">You have a new enquiry for 
+            <% if(leads.property && leads.property.slug){ %>
+                <a target="_blank" href="https://yallahproperty.ae/en/property/<%= leads.property.slug %>">this</a>
+                <% } %>
+            property. Please find the enquiry details below </p>
+        <table class="text-left" style="margin-top: 20px;">
+           <tbody>
+            <tr>
+                <th>Name</th>
+                <td class="text"><%= leads.name %></td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td class="text"><%= leads.email %></td>
+            </tr>
+            <% if(leads.phone){ %>
+            <tr>
+                <th>Phone</th>
+                <td class="text"><a href="tel:+<%= leads.phoneCode %><%= leads.phone %>">+<%= leads.phoneCode %><%= leads.phone %></a></td>
+            </tr>
+            <% } %>
+            <tr>
+                <th width="80px">Message</th>
+                <td class="text"><%= leads.message %></td>
+            </tr>
+           </tbody>
+        </table>
+
+       <div class="text" style="margin-top: 30px;text-align: center;">
+        <% if(leads.source === "whatsapp"){ %>
+            <a target="_blank" class="link-button"  href="<%= link %>">Reply Lead</a>
+            <% } %>
+        <% if(leads.property && leads.property.slug){ %>
+            <a target="_blank" class="link-button"  href="https://yallahproperty.ae/en/property/<%= leads.property.slug %>">View Property</a>
+            <% } %>
+       </div>
+    </div>
+</div>
+<%- include("layout/email-footer") -%>

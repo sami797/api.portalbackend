@@ -1,0 +1,179 @@
+<%- include("layout/email-header") -%>
+<div class="welcome-text">
+    <div class="heading"> Congratulations <%= (organization?.localization) ? organization?.localization[0]?.name : "" %>!</div>
+    <div class="description">Your Yallah account has been activated successfully. To get started, you may login from our home page using the following credentials:</div>
+    <div class="description">Login details <br/><br/>
+        Adminpanel: <a href="https://admin.yallahproperty.ae" class="color-text" target="_blank"><b>https://admin.yallahproperty.ae</b></a> <br/>
+        Email: <b><%= organization.email %></b> <br/>
+        Password: <b>Our customer relationship manager might have shared the account password in your email or in your preferred communication channel. You may also click on forget password to create a new passowrd.</b></div>
+        <br/><br/>
+        <div class="description mt-50">As a Yallah agent, you can manage your property listings, review the overall performance, view detailed statistics, and do much more.</div>
+
+</div>
+<div class="how-to-container">
+    <p class="how-to-text">Make the most use of Yallah Property</p>
+    <div class="how-to-card">
+        <img src="<%= process.env.IMAGE_CDN_URL %>public/assets/6.png" />
+        <div class="how-to-card-right">
+            <p class="card-title">Manage user</p>
+            <p class="card-description">Monitor overall user performance to track growth and alter roles accordingly.</p>
+        </div>
+    </div>
+    <div class="how-to-card">
+        <img src="<%= process.env.IMAGE_CDN_URL %>public/assets/5.png" />
+        <div class="how-to-card-right">
+            <p class="card-title">Add Properties</p>
+            <p class="card-description">Publish listings for the latest properties and choose the most ideal package for the best performance.</p>
+        </div>
+    </div>
+    <div class="how-to-card">
+        <img src="<%= process.env.IMAGE_CDN_URL %>public/assets/4.png" />
+        <div class="how-to-card-right">
+            <p class="card-title">Manage permissions</p>
+            <p class="card-description">Have complete control over the permissions provided and activities performed by every user.</p>
+        </div>
+    </div>
+    <a class="link-button" href="https://admin.yallahproperty.ae/login" target="_blank">Start your Yallah journey</a>
+</div>
+<div class="effective-container">
+    <p class="effective-text">Effective tools for you</p>
+    <div class="effective-card">
+        <img src="<%= process.env.IMAGE_CDN_URL %>public/assets/15.png" />
+        <div class="effective-card-right">
+            <p class="card-title">Add Property Deals</p>
+            <p class="card-description">List customized deals based on the listing and client to close the deal</p>
+                <a class="link-button" href="https://admin.yallahproperty.ae/properties" target="_blank">Add Deals</a>
+        </div>
+    </div>
+    <div class="effective-card">
+        <img src="<%= process.env.IMAGE_CDN_URL %>public/assets/3.png" />
+        <div class="effective-card-right">
+            <p class="card-title">Manage Deals</p>
+            <p class="card-description">Take control over existing deals and edit your bid accordingly.<br/>&nbsp;</p>
+                <a class="link-button" href="https://admin.yallahproperty.ae/properties" target="_blank">Manage Deals</a>
+        </div>
+    </div>
+    <div class="effective-card">
+        <img src="<%= process.env.IMAGE_CDN_URL %>public/assets/2.png" />
+        <div class="effective-card-right">
+            <p class="card-title">Manage Reviews</p>
+            <p class="card-description">Use the customer criticism and compliments to strengthen your performance.</p>
+                <a class="link-button" href="https://admin.yallahproperty.ae/properties" target="_blank">View Reviews</a>
+        </div>
+    </div>
+    <div class="effective-card">
+        <img src="<%= process.env.IMAGE_CDN_URL %>public/assets/1.png" />
+        <div class="effective-card-right">
+            <p class="card-title">Price Trends</p>
+            <p class="card-description">Stay updated on the latest price trends to make informed decisions.</p>
+                <a class="link-button" href="https://admin.yallahproperty.ae/dashboard/price-finder" target="_blank">View Price Trends</a>
+        </div>
+    </div>
+
+  
+</div>
+
+<style>
+  .color-text{
+    color: rgba(89, 89, 89, 1);;
+  }
+
+    .how-to-container {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        border-bottom: 5px solid #F2f2f2;
+    }
+
+    .how-to-container>.how-to-text {
+        font-size: 1rem;
+        color: rgba(19, 119, 72, 1);
+        font-weight: bold;
+    }
+
+    .how-to-card {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .how-to-card>img {
+        height: 80px;
+        width: 80px;
+        object-fit: contain;
+    }
+
+    .how-to-card-right>.card-title {
+        font-size: 0.9rem;
+        font-weight: bold;
+    }
+
+    .how-to-card-right>.card-description {
+        font-size: 0.9rem;
+    }
+    .how-to-container>.link-button{
+        display: flex;
+        justify-content: center;
+        margin: auto;
+        background-color: rgba(19, 119, 72, 1);
+        color: white;
+        text-decoration: none;
+        /* width: 25%; */
+        padding: 1rem;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        font-size: small;
+    }
+
+    .effective-container {
+        padding: 1rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 0.75rem;
+    }
+    .effective-container>.effective-text{
+        width: 100%;
+        font-size: 1rem;
+        color: rgba(19, 119, 72, 1);
+        font-weight: bold;
+    }
+    .effective-card{
+        margin-bottom: 1rem;
+        width: 45%;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .effective-card-right>.card-title {
+        font-size: 0.9rem;
+        font-weight: bold;
+    }
+
+    .effective-card-right>.card-description {
+        font-size: 0.9rem;
+    }
+    .effective-card-right>.link-button{
+        display: flex;
+        justify-content: center;
+        margin: auto;
+        padding: 0.75rem;
+        border: 1px solid rgba(89, 89, 89, 1);
+        border-radius: 0.25rem;
+        cursor: pointer;
+        font-size: small;
+        text-decoration: none;
+        color: rgba(89, 89, 89, 1);;
+    }
+
+    .effective-card>img{
+        object-fit: contain;
+        height: 80px;
+        width: 80px;
+    }
+  
+</style>
+
+<%- include("layout/email-footer") -%>   

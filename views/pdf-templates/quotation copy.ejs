@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    DAT Quotation <%= quotation.quoteNumber %>
+  </title>
+
+  <link rel="stylesheet" type="text/css" hs-webfonts="true"
+    href="https://fonts.googleapis.com/css?family=Lato|Lato:i,b,bi">
+  <meta property="og:title" content="DAT Quotation">
+
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style type="text/css">
+    h2 {
+      font-size: 28px;
+      font-weight: 900;
+      margin: 0;
+      padding: 0;
+    }
+
+    h3 {
+      font-size: 24px;
+      font-weight: 900;
+      margin: 0;
+      padding: 0;
+    }
+
+    h5 {
+      font-size: 18px;
+      font-weight: 900;
+      margin: 0;
+      padding: 0;
+    }
+
+    p {
+      font-size: 16px;
+      margin: 0;
+      padding: 0;
+    }
+
+    td {
+      vertical-align: top;
+    }
+
+    #email {
+      margin: auto;
+      width: 1024px;
+      padding: 15px;
+      background-color: white;
+    }
+
+    #tableHeader,
+    th {
+      border-bottom: 1px solid #000000;
+    }
+
+    .tableFooter {
+      border-bottom: 1px solid #000000;
+      border-top: 1px solid #c0c0c0;
+      padding: 10px 0px;
+    }
+
+    .table-items p {
+      padding: 4px 0px
+    }
+  </style>
+</head>
+
+<body bgcolor="#F5F8FA"
+  style="width: 100%; margin: auto 0; padding:0; font-family:Lato, sans-serif; word-break:break-word">
+  <div id="email">
+    <!--DAT Logo-->
+    <img alt="<%= submissionBy?.name %>" src="<%= process.env.IMAGE_CDN_URL + submissionBy?.logo %>" width="70px"
+      align="right" style="padding-right: 20px;">
+
+    <table role="presentation" border="0" cellpadding="0" cellspacing="10px" style="width: 100%; padding: 0px 20px;">
+      <tr>
+        <td style="width: 60%;">
+          <h2>QUOTE</h2>
+          <!--Company Name-->
+          <p>
+            <%= clientData?.name %>
+          </p>
+          <p>
+            <%= clientData?.email %>
+          </p>
+          <p>
+            <% if(clientData?.phone){ %>
+            <%= clientData?.phoneCode + clientData?.phone %>
+            <% } %>
+          </p>
+        </td>
+
+        <td>
+          <!--Date-->
+          <h5>Date</h5>
+          <p>
+            <%= convertDate(quotation.issueDate) %>
+          </p>
+          <!--Expiry-->
+          <% if(quotation.expiryDate){ %>
+          <h5 style="padding-top: 10px;">Expiry</h5>
+          <p>
+            <%= convertDate(quotation.expiryDate) %>
+          </p>
+          <% } %>
+          <!--Quote Number-->
+          <h5 style="padding-top: 10px;">Quote Number</h5>
+          <p><%= quotation.quoteNumber %>
+          </p>
+
+        </td>
+
+        <!--DAT Address-->
+        <td style="width: 20%;">
+          <h5>
+            <%= submissionBy?.name %>
+          </h5>
+          <p>
+            <%= submissionBy?.address %>
+              <br />
+          </p>
+
+          <!--TRN No.-->
+          <h5 style="padding-top: 10px;">TRN No.</h5>
+          <p>
+            <%= submissionBy?.taxRegistrationNumber %>
+          </p>
+        </td>
+      </tr>
+    </table>
+
+    <!-- Details Summary -->
+    <table role="presentation" width="100%" style="padding: 0px 20px;">
+      <tr>
+        <td align="left">
+          <h3 style="padding-bottom: 0px; margin-bottom: 0px;">Scope of work</h2>
+            <div style="white-space: pre-line;"><%- quotation.scopeOfWork %></div>
+        </td>
+      </tr>
+    </table>
+
+    <!-- Details Breakdown -->
+    <table width="100%" style="margin-top: 20px; padding: 0px 20px; border-spacing: 0px 5px;" cellspacing="0px">
+      <thead>
+        <tr>
+          <th class="tableHeader" style="width: 50%;" align="left">Description</th>
+          <th class="tableHeader" align="right">Quantity</th>
+          <th class="tableHeader" align="center">Unit Price</th>
+          <th class="tableHeader" align="right">Amount AED</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% 
+        quotation?.QuotationMilestone.forEach((ele)=> { %>
+          <tr>
+            <td style="padding-bottom: 10px;" class="table-items">
+              <div style="white-space: pre-line;"><%= ele.title %></div>
+            </td>
+            <td align="right"><%= (ele.quantity > 0) ? ele.quantity : "" %></td>
+            <td align="center">
+              <% 
+              let milestoneTotal = ele.amount * ele.quantity;
+              %>
+              <%= (ele.quantity > 0) ? ele.amount : "" %>
+            </td>
+            <td align="right">
+              <%= (ele.quantity > 0) ? milestoneTotal: "" %>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="4" style="border-bottom:1px solid #ddd;"></td>
+          </tr>
+          <% }) %>
+      </tbody>
+
+      <tfoot>
+        <% if(quotation.hasSupervision){ 
+          %>
+        <tr>
+          <td class="tableFooter">Supervision (<%= getEnumKeyByEnumValue(SupervisionPaymentSchedule, quotation.supervisionPaymentSchedule) %>)</td>
+          <td align="right" class="tableFooter"></td>
+          <td align="center" class="tableFooter"></td>
+          <td align="right" class="tableFooter"><%= quotation.supervisionMonthlyCharge %></td>
+        </tr>
+        <% } %>
+
+        <tr style="width: 100%;" align="right">
+          <td></td>
+          <td></td>
+          <td style="text-align: left;">Subtotal</td>
+          <td colspan="1"><%= quotation.subTotal %></td>
+        </tr>
+        <% taxData.forEach(([key, ele]) => { %>
+          <tr style="width: 100%;" align="right">
+            <td></td>
+            <td></td>
+            <td style="text-align: left;"><%= `${ele.title} (${ele.rate}%)` %></td>
+            <td colspan="1"><%= ele.totalTax.toFixed(2) %></td>
+          </tr>
+          <% }) %>
+        <tr style="width: 100%;" align="right">
+          <td></td>
+          <td></td>
+          <td style="font-weight: bold; text-align: left; border-top: 2px solid black; border-bottom: 2px solid black; padding: 5px 0px;">TOTAL</td>
+          <td style="font-weight: bold; border-top: 2px solid black; border-bottom: 2px solid black;padding: 5px 0px;"><%= quotation.total.toFixed(2) %> AED</td>
+        </tr>
+
+      </tfoot>
+    </table>
+
+    <!--Terms -->
+    <table role="presentation" width="100%" style="margin-top: 50px;">
+      <tr>
+        <td align="left" style="padding-left: 20px">
+          <h5> Terms</h2>
+        </td>
+      </tr>
+      <tr>
+        <td align="left" style="white-space: pre-line; padding-left: 20px">
+         <%= quotation.paymentTerms %>
+        </td>
+      </tr>
+    </table>
+
+    <!--Page footer-->
+    <table role="presentation" width="100%" align="bottom" style="padding: 20px; font-size: 12px;">
+      <tr>
+        <td>
+          Registered Office: <%= submissionBy?.address %>
+        </td>
+      </tr>
+      </footer>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,1852 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = []
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model Note {
+  id        Int      @id @default(autoincrement())
+  notes     String
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  
+  User     User     @relation(fields: [userId], references: [id])
+}
+model Country {
+  id               Int                @id @default(autoincrement())
+  name             String             @db.VarChar(255)
+  isoCode          String             @unique @db.VarChar(100)
+  vat              Float              @default(0)
+  shortName        String             @db.VarChar(200)
+  displayName      String?            @db.VarChar(200)
+  phoneCode        String?            @db.VarChar(5)
+  flag             String?            @db.VarChar(250)
+  status           Int?               @default(2)
+  isPublished      Boolean            @default(true)
+  isDeleted        Boolean            @default(false)
+  addedDate        DateTime           @default(now())
+  modifiedDate     DateTime?
+  deletedDate      DateTime?
+  Organization     Organization[]
+  PaymentGateway   PaymentGateway[]
+  SmsConfiguration SmsConfiguration[]
+}
+
+
+
+
+
+model Role {
+  id                Int                    @id @default(autoincrement())
+  title             String                 @unique @db.VarChar(255)
+  slug              String                 @unique @db.VarChar(255)
+  description       String?
+  addedDate         DateTime               @default(now())
+  modifiedDate      DateTime?
+  deletedDate       DateTime?
+  isDeleted         Boolean                @default(false)
+  isPublished       Boolean                @default(true)
+  addedById         Int?
+  deletedById       Int?
+  modifiedById      Int?
+  level             Int                    @default(9)
+  AddedBy           User?                  @relation("RoleAddedBy", fields: [addedById], references: [id])
+  DeletedBy         User?                  @relation("RoleDeletedBy", fields: [deletedById], references: [id])
+  ModifiedBy        User?                  @relation("RoleModifiedBy", fields: [modifiedById], references: [id])
+  DashboardElements RoleDashboardElement[]
+  RolePermissions   RolePermissions[]
+  UserRole          UserRole[]
+}
+
+model Organization {
+  id                             Int                              @id @default(autoincrement())
+  uuid                           String                           @unique @default(uuid()) @db.VarChar(255)
+  name                           String                           @db.VarChar(255)
+  description                    String?
+  email                          String?                          @unique @db.VarChar(255)
+  phone                          String?                          @db.VarChar(20)
+  phoneCode                      String?                          @db.VarChar(5)
+  whatsapp                       String?                          @db.VarChar(20)
+  address                        String?
+  locationMap                    String?
+  logo                           String?                          @db.VarChar(255)
+  countryId                      Int?
+  city                           String?                          @db.VarChar(255)
+  status                         Int                              @default(4)
+  addedDate                      DateTime                         @default(now())
+  modifiedDate                   DateTime?
+  deletedDate                    DateTime?
+  isDeleted                      Boolean                          @default(false)
+  isPublished                    Boolean                          @default(true)
+  type                           Int                              @default(4)
+  addedById                      Int?
+  deletedById                    Int?
+  modifiedById                   Int?
+  parentId                       Int?
+  taxRegistrationNumber          String?                          @db.VarChar(50)
+  bankAccountHolderName          String?                          @db.VarChar(255)
+  bankAccountNumber              String?                          @db.VarChar(255)
+  bankIBAN                       String?                          @db.VarChar(255)
+  bankName                       String?                          @db.VarChar(255)
+  bankSwiftCode                  String?                          @db.VarChar(255)
+  organizationCode               String?                          @db.VarChar(20)
+  workingHoursId                 Int?
+  digitalStamp                   String?                          @db.VarChar(255)
+  CompanyAsset                   CompanyAsset[]
+  LeadsSubmittedBy               Leads[]
+  AddedBy                        User?                            @relation("OrganizationAddedBy", fields: [addedById], references: [id])
+  Country                        Country?                         @relation(fields: [countryId], references: [id])
+  DeletedBy                      User?                            @relation("OrganizationDeletedBy", fields: [deletedById], references: [id])
+  ModifiedBy                     User?                            @relation("OrganizationModifiedBy", fields: [modifiedById], references: [id])
+  Parent                         Organization?                    @relation("OrganizationBranch", fields: [parentId], references: [id])
+  OrganizationBranch             Organization[]                   @relation("OrganizationBranch")
+  WorkingHours                   WorkingHours?                    @relation(fields: [workingHoursId], references: [id])
+  OrganizationDepartmentRelation OrganizationDepartmentRelation[]
+  ProjectSubmittedBy             Project[]                        @relation("ProjectSubmittedBy")
+  User                           User[]
+}
+
+model Client {
+  id                    Int                    @id @default(autoincrement())
+  uuid                  String                 @unique @default(uuid()) @db.VarChar(255)
+  name                  String                 @db.VarChar(255)
+  type                  Int                    @default(1)
+  designation           String?                @db.VarChar(255)
+  phone                 String?                @db.VarChar(20)
+  phoneCode             String?                @db.VarChar(5)
+  whatsapp              String?                @db.VarChar(20)
+  email                 String?                @unique @db.VarChar(255)
+  address               String?                @db.VarChar(255)
+  companyId             Int?
+  addedById             Int?
+  addedDate             DateTime               @default(now())
+  deletedById           Int?
+  deletedDate           DateTime?
+  isDeleted             Boolean                @default(false)
+  modifiedById          Int?
+  modifiedDate          DateTime?
+  taxRegistrationNumber String?                @db.VarChar(50)
+  AddedBy               User?                  @relation("ClientAddedBy", fields: [addedById], references: [id])
+  Company               Client?                @relation("ClientUser", fields: [companyId], references: [id])
+  ClientUsers           Client[]               @relation("ClientUser")
+  DeletedBy             User?                  @relation("ClientDeletedBy", fields: [deletedById], references: [id])
+  ModifiedBy            User?                  @relation("ClientModifiedBy", fields: [modifiedById], references: [id])
+  ClientXeroConnection  ClientXeroConnection[]
+  FileshareLogs         FileshareLogs[]
+  Invoices              Invoice[]
+  Leads                 Leads[]
+  LeadRepresentative    Leads[]                @relation("LeadRepresentative")
+  Permits               Permit[]
+  Project               Project[]
+  ProjectClient         ProjectClient[]
+  Transactions          Transactions[]
+  
+   
+}
+
+
+
+
+model ClientXeroConnection {
+  clientId      Int
+  xeroTenantId  String
+  xeroReference String
+  Client        Client @relation(fields: [clientId], references: [id])
+
+  @@unique([xeroTenantId, clientId, xeroReference])
+}
+
+model User {
+  id                             Int                              @id @default(autoincrement())
+  uuid                           String                           @unique @default(uuid()) @db.VarChar(255)
+  firstName                      String                           @db.VarChar(255)
+  lastName                       String                           @db.VarChar(255)
+  phone                          String?                          @db.VarChar(20)
+  phoneCode                      String?                          @db.VarChar(5)
+  whatsapp                       String?                          @db.VarChar(20)
+  email                          String?                          @unique @db.VarChar(255)
+  address                        String?                          @db.VarChar(255)
+  preferences                    String?                          @db.VarChar(255)
+  phoneVerified                  Boolean                          @default(false)
+  emailVerified                  Boolean                          @default(false)
+  password                       String?                          @db.VarChar(255)
+  profile                        String?                          @db.VarChar(255)
+  isAvatar                       Boolean                          @default(false)
+  resetToken                     String?
+  resetTokenValidity             DateTime?
+  status                         Int                              @default(1)
+  userSignupSource               String?                          @db.VarChar(50)
+  userSignupDeviceAgent          String?                          @db.VarChar(255)
+  addedDate                      DateTime                         @default(now())
+  modifiedDate                   DateTime?
+  deletedDate                    DateTime?
+  isDeleted                      Boolean                          @default(false)
+  isPublished                    Boolean                          @default(false)
+  organizationId                 Int?
+  departmentId                   Int?
+  managerId                      Int?
+  addedById                      Int?
+  deletedById                    Int?
+  modifiedById                   Int?
+  designation                    String?                          @db.VarChar(255)
+  dateOfJoining                  DateTime?
+  lastWorkingDate                DateTime?
+  remainingAnnualLeaves          Int                              @default(30)
+  enableRemoteCheckin            Boolean                          @default(false)
+  dataAccessRestrictedTo         Int[]
+  AdminAction                    AdminAction[]
+  AssetAllocation                AssetAllocation[]
+  AttendanceAddedBy              Attendance[]                     @relation("AttendanceAddedBy")
+  AttendanceModifiedBy           Attendance[]                     @relation("AttendanceModifiedBy")
+  Attendance                     Attendance[]
+  authTokens                     AuthTokens[]
+  BiometricsAddedBy              BiometricsChecks[]               @relation("BiometricsAddedBy")
+  BiometricsModifiedBy           BiometricsChecks[]               @relation("BiometricsModifiedBy")
+  BiometricsChecks               BiometricsChecks[]
+  BiometricsJob                  BiometricsJob[]
+  BlogAddedBy                    Blogs[]                          @relation("BlogAddedBy")
+  BlogDeletedBy                  Blogs[]                          @relation("BlogDeletedBy")
+  BlogModifiedBy                 Blogs[]                          @relation("BlogModifiedBy")
+  BlogCategoryAddedBy            BlogsCategory[]                  @relation("BlogCategoryAddedBy")
+  BlogCategoryDeletedBy          BlogsCategory[]                  @relation("BlogCategoryDeletedBy")
+  BlogCategoryModifiedBy         BlogsCategory[]                  @relation("BlogCategoryModifiedBy")
+  CarReservationRequest          CarReservationRequest[]
+  CashAdvanceRequest             CashAdvanceRequest[]
+  ClientAddedBy                  Client[]                         @relation("ClientAddedBy")
+  ClientDeletedBy                Client[]                         @relation("ClientDeletedBy")
+  ClientModifiedBy               Client[]                         @relation("ClientModifiedBy")
+  DailyRoutine                   DailyRoutine[]
+  EnquiryAddedBy                 Enquiry[]                        @relation("EnquiryAddedBy")
+  EnquiryAssignedBy              Enquiry[]                        @relation("EnquiryAssignedBy")
+  EnquiryAssignedTo              Enquiry[]                        @relation("EnquiryAssignedTo")
+  EnquiryModifiedBy              Enquiry[]                        @relation("EnquiryModifiedBy")
+  Feedback                       Feedback[]
+  FileAddedBy                    FileManagement[]                 @relation("FileAddedBy")
+  FileDeletedBy                  FileManagement[]                 @relation("FileDeletedBy")
+  FileModifiedBy                 FileManagement[]                 @relation("FileModifiedBy")
+  FileshareLogs                  FileshareLogs[]
+  InvoiceAddedBy                 Invoice[]                        @relation("InvoiceAddedBy")
+  InvoiceModifiedBy              Invoice[]                        @relation("InvoiceModifiedBy")
+  InvoiceFollowUp                InvoiceFollowUp[]
+  LeadEnquiryFollowUp            LeadEnquiryFollowUp[]
+  LeadAddedBy                    Leads[]                          @relation("LeadAddedBy")
+  LeadAssignedBy                 Leads[]                          @relation("LeadAssignedBy")
+  LeadAssignedTo                 Leads[]                          @relation("LeadAssignedTo")
+  LeadModifiedBy                 Leads[]                          @relation("LeadModifiedBy")
+  LeaveCredits                   LeaveCredits[]
+  LeaveRequest                   LeaveRequest[]
+  OrganizationAddedBy            Organization[]                   @relation("OrganizationAddedBy")
+  OrganizationDeletedBy          Organization[]                   @relation("OrganizationDeletedBy")
+  OrganizationModifiedBy         Organization[]                   @relation("OrganizationModifiedBy")
+  OrganizationDepartmentRelation OrganizationDepartmentRelation[]
+  ContentAddedBy                 PagesContent[]                   @relation("ContentAddedBy")
+  ContentModifiedBy              PagesContent[]                   @relation("ContentModifiedBy")
+  PaymentGatewayAddedBy          PaymentGateway[]                 @relation("PaymentGatewayAddedBy")
+  PaymentGatewayDeletedBy        PaymentGateway[]                 @relation("PaymentGatewayDeletedBy")
+  PaymentGatewayModifiedBy       PaymentGateway[]                 @relation("PaymentGatewayModifiedBy")
+  PayrollModifiedBy              Payroll[]                        @relation("PayrollModifiedBy")
+  Payroll                        Payroll[]
+  PermitAddedBy                  Permit[]
+  PermitModifiedBy               Permit[]                         @relation("PermitModifiedBy")
+  ProjectAddedBy                 Project[]                        @relation("ProjectAddedBy")
+  ProjectDeletedBy               Project[]                        @relation("ProjectDeletedBy")
+  ProjectModifiedBy              Project[]                        @relation("ProjectModifiedBy")
+  ProjectHoldBy          Project[]               @relation("ProjectHoldBy")
+  ProjectConversation            ProjectConversation[]
+  ProjectConversationReadLog     ProjectConversationReadLog[]
+  ProjectMembers                 ProjectMembers[]
+  PublicHoliday                  PublicHoliday[]
+  QuotationAddedBy               Quotation[]                      @relation("QuotationAddedBy")
+  QuotationModifiedBy            Quotation[]                      @relation("QuotationModifiedBy")
+  QuotationMilestone             QuotationMilestone[]
+  Reimbursement                  Reimbursement[]
+  RoleAddedBy                    Role[]                           @relation("RoleAddedBy")
+  RoleDeletedBy                  Role[]                           @relation("RoleDeletedBy")
+  RoleModifiedBy                 Role[]                           @relation("RoleModifiedBy")
+  RolePermissionsAddedBy         RolePermissions[]                @relation("RolePermissionsAddedBy")
+  Salary                         Salary[]
+  SavedSearches                  SavedSearches[]
+  smsConfiguration               SmsConfiguration[]
+  staticPageSEO                  StaticPageSEO[]
+  Notifications                  Subscribers[]
+  systemLogs                     SystemLogs[]
+  TaskAddedBy                    Task[]                           @relation("TaskAddedBy")
+  TaskClosedBy                   Task[]                           @relation("TaskClosedBy")
+  TaskMembers                    TaskMembers[]
+  TransactionAddedBy             Transactions[]                   @relation("TransactionAddedBy")
+  TransactionAssignedTo          Transactions[]                   @relation("TransactionAssignedTo")
+  TransactionModifiedBy          Transactions[]                   @relation("TransactionModifiedBy")
+  AddedBy                        User?                            @relation("UserAddedBy", fields: [addedById], references: [id])
+  UserAddedBy                    User[]                           @relation("UserAddedBy")
+  DeletedBy                      User?                            @relation("UserDeletedBy", fields: [deletedById], references: [id])
+  UserDeletedBy                  User[]                           @relation("UserDeletedBy")
+  Department                     Department?                      @relation(fields: [departmentId], references: [id])
+  Manager                        User?                            @relation("managerToEmployee", fields: [managerId], references: [id])
+  Employees                      User[]                           @relation("managerToEmployee")
+  ModifiedBy                     User?                            @relation("UserModifiedBy", fields: [modifiedById], references: [id])
+  UserModifiedBy                 User[]                           @relation("UserModifiedBy")
+  Organization                   Organization?                    @relation(fields: [organizationId], references: [id])
+  UserAlertsSetting              UserAlertsSetting[]
+  UserDocumentAddedBy            UserDocument[]                   @relation("UserDocumentAddedBy")
+  UserDocuments                  UserDocument[]                   @relation("UserDocument")
+  UserMeta                       UserMeta[]
+  userRole                       UserRole[]
+   notes                          Note[]
+}
+
+model UserRole {
+  id     Int  @id @default(autoincrement())
+  userId Int
+  roleId Int
+  Role   Role @relation(fields: [roleId], references: [id])
+  User   User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, roleId])
+}
+
+model UserMeta {
+  id     Int    @id @default(autoincrement())
+  key    String @db.VarChar(255)
+  value  String
+  userId Int
+  User   User   @relation(fields: [userId], references: [id])
+
+  @@unique([key, userId])
+}
+
+model UserDocument {
+  id           Int      @id @default(autoincrement())
+  title        String?  @db.VarChar(255)
+  file         String?  @db.VarChar(255)
+  documentType String?  @db.VarChar(255)
+  mimeType     String?  @db.VarChar(100)
+  addedDate    DateTime @default(now())
+  userId       Int?
+  addedById    Int?
+  isDeleted    Boolean  @default(false)
+  AddedBy      User?    @relation("UserDocumentAddedBy", fields: [addedById], references: [id])
+  User         User?    @relation("UserDocument", fields: [userId], references: [id])
+}
+
+model AuthTokens {
+  id           Int        @id @default(autoincrement())
+  tokenType    TokenTypes
+  token        String
+  userId       Int?
+  userAgent    String?    @db.VarChar(255)
+  userIP       String?    @db.VarChar(50)
+  status       Int        @default(1)
+  addedDate    DateTime   @default(now())
+  modifiedDate DateTime?
+  user         User?      @relation(fields: [userId], references: [id])
+}
+
+model Modules {
+  id          Int               @id @default(autoincrement())
+  name        String            @db.VarChar(255)
+  slug        String            @unique @db.VarChar(255)
+  icon        String?           @db.VarChar(100)
+  isMenuItem  Boolean           @default(true)
+  visibility  ModulesVisibility @default(system)
+  order       Int               @default(99)
+  url         String?           @db.VarChar(255)
+  description String?
+  Permissions Permissions[]
+}
+
+model Permissions {
+  id              Int               @id @default(autoincrement())
+  name            String?           @db.VarChar(255)
+  action          String            @db.VarChar(255)
+  icon            String?           @db.VarChar(100)
+  moduleId        Int
+  visibility      ModulesVisibility @default(organization)
+  condition       Json?
+  url             String?           @db.VarChar(255)
+  isMenuItem      Boolean           @default(false)
+  order           Int               @default(99)
+  description     String?
+  Module          Modules           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  RolePermissions RolePermissions[]
+
+  @@unique([action, moduleId])
+}
+
+model RolePermissions {
+  id            Int         @id @default(autoincrement())
+  addedDate     DateTime    @default(now())
+  roleId        Int
+  permissionsId Int
+  addedById     Int?
+  AddedBy       User?       @relation("RolePermissionsAddedBy", fields: [addedById], references: [id])
+  Permission    Permissions @relation(fields: [permissionsId], references: [id], onDelete: Cascade)
+  Role          Role        @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionsId])
+}
+
+model StaticPageSEO {
+  id             Int        @id @default(autoincrement())
+  seoTitle       String     @db.VarChar(255)
+  seoDescription String     @db.VarChar(500)
+  image          String?    @db.VarChar(255)
+  isDefault      Int        @default(0)
+  sitePageId     Int?       @unique
+  addedDate      DateTime   @default(now())
+  modifiedDate   DateTime?
+  modifiedById   Int?
+  ModifiedBy     User?      @relation(fields: [modifiedById], references: [id])
+  SitePage       SitePages? @relation(fields: [sitePageId], references: [id])
+}
+
+model SystemLogs {
+  id               Int      @id @default(autoincrement())
+  table            String?  @db.VarChar(100)
+  tableColumnKey   String?  @db.VarChar(100)
+  tableColumnValue String?  @db.VarChar(100)
+  valueType        String?  @db.VarChar(50)
+  actionType       String?  @db.VarChar(255)
+  message          String?  @db.VarChar(255)
+  endPoint         String?  @db.VarChar(100)
+  controllerName   String?  @db.VarChar(100)
+  data             Json?
+  addedDate        DateTime @default(now())
+  addedById        Int?
+  AddedBy          User?    @relation(fields: [addedById], references: [id])
+}
+
+model FaqsCategory {
+  id            Int            @id @default(autoincrement())
+  slug          String         @unique @db.VarChar(255)
+  parentId      Int?
+  isPublished   Boolean        @default(true)
+  isDeleted     Boolean        @default(false)
+  forAdminpanel Boolean        @default(false)
+  title         String         @db.VarChar(255)
+  description   String?
+  Faqs          Faqs[]
+  Parent        FaqsCategory?  @relation("FaqsChildCategory", fields: [parentId], references: [id])
+  ChildCategory FaqsCategory[] @relation("FaqsChildCategory")
+}
+
+model Faqs {
+  id             Int          @id @default(autoincrement())
+  slug           String       @unique @db.VarChar(255)
+  faqsCategoryId Int
+  forAdminpanel  Boolean      @default(false)
+  isPublished    Boolean      @default(true)
+  isDeleted      Boolean      @default(false)
+  title          String       @db.VarChar(255)
+  description    String?
+  FaqsCategory   FaqsCategory @relation(fields: [faqsCategoryId], references: [id], onDelete: Cascade)
+  Media          FaqsMedia[]
+}
+
+model FaqsMedia {
+  id           Int     @id @default(autoincrement())
+  uuid         String  @unique @default(uuid()) @db.VarChar(255)
+  title        String? @db.VarChar(255)
+  file         String  @db.VarChar(255)
+  fileType     String? @db.VarChar(100)
+  videoPreview String? @db.VarChar(255)
+  path         String? @db.VarChar(500)
+  faqId        Int?
+  isDeleted    Boolean @default(false)
+  isPublished  Boolean @default(true)
+  Faq          Faqs?   @relation(fields: [faqId], references: [id], onDelete: Cascade)
+}
+
+model SitePages {
+  id                  Int                   @id @default(autoincrement())
+  slug                String                @unique @db.VarChar(255)
+  title               String                @db.VarChar(255)
+  description         String?               @db.VarChar(255)
+  isPublished         Boolean               @default(true)
+  isDeleted           Boolean               @default(false)
+  PageSectionRelation PageSectionRelation[]
+  StaticPageSEO       StaticPageSEO?
+}
+
+model PagesSection {
+  id                  Int                   @id @default(autoincrement())
+  slug                String                @unique @db.VarChar(255)
+  title               String                @unique @db.VarChar(255)
+  description         String?               @db.VarChar(255)
+  hasMultipleItems    Boolean               @default(true)
+  isPublished         Boolean               @default(true)
+  isDeleted           Boolean               @default(false)
+  PageSectionRelation PageSectionRelation[]
+  PagesContent        PagesContent[]
+}
+
+model PageSectionRelation {
+  id            Int          @id @default(autoincrement())
+  sitePageId    Int
+  pageSectionId Int
+  PageSection   PagesSection @relation(fields: [pageSectionId], references: [id])
+  SitePage      SitePages    @relation(fields: [sitePageId], references: [id])
+
+  @@unique([sitePageId, pageSectionId])
+}
+
+model PagesContent {
+  id            Int          @id @default(autoincrement())
+  pageSectionId Int
+  image         String?      @db.VarChar(255)
+  imageAlt      String?      @db.VarChar(255)
+  isDefault     Int          @default(0)
+  addedDate     DateTime     @default(now())
+  addedById     Int?
+  modifiedDate  DateTime?
+  modifiedById  Int?
+  isPublished   Boolean      @default(true)
+  isDeleted     Boolean      @default(false)
+  title         String       @db.VarChar(255)
+  highlight     String?
+  description   String?
+  AddedBy       User?        @relation("ContentAddedBy", fields: [addedById], references: [id])
+  ModifiedBy    User?        @relation("ContentModifiedBy", fields: [modifiedById], references: [id])
+  PageSection   PagesSection @relation(fields: [pageSectionId], references: [id])
+}
+
+model BlogsCategory {
+  id             Int       @id @default(autoincrement())
+  slug           String    @unique @db.VarChar(255)
+  title          String    @db.VarChar(255)
+  highlight      String?
+  description    String?
+  status         Int       @default(1)
+  seoTitle       String?   @db.VarChar(255)
+  seoDescription String?   @db.VarChar(500)
+  image          String?   @db.VarChar(255)
+  imageAlt       String?   @db.VarChar(255)
+  isPublished    Boolean   @default(false)
+  isDeleted      Boolean   @default(false)
+  addedDate      DateTime  @default(now())
+  modifiedDate   DateTime?
+  deletedDate    DateTime?
+  addedById      Int?
+  modifiedById   Int?
+  deletedById    Int?
+  blogs          Blogs[]
+  AddedBy        User?     @relation("BlogCategoryAddedBy", fields: [addedById], references: [id])
+  DeleteddBy     User?     @relation("BlogCategoryDeletedBy", fields: [deletedById], references: [id])
+  ModifiedBy     User?     @relation("BlogCategoryModifiedBy", fields: [modifiedById], references: [id])
+}
+
+model Blogs {
+  id             Int            @id @default(autoincrement())
+  blogCategoryId Int?
+  category       Int            @default(1)
+  slug           String         @unique @db.VarChar(255)
+  status         Int            @default(1)
+  seoTitle       String?        @db.VarChar(255)
+  seoDescription String?        @db.VarChar(500)
+  image          String?        @db.VarChar(255)
+  imageAlt       String?        @db.VarChar(255)
+  isDeleted      Boolean        @default(false)
+  addedDate      DateTime       @default(now())
+  modifiedDate   DateTime?
+  deletedDate    DateTime?
+  addedById      Int?
+  modifiedById   Int?
+  deletedById    Int?
+  title          String         @db.VarChar(255)
+  highlight      String?
+  description    String?
+  Images         BlogImages[]
+  AddedBy        User?          @relation("BlogAddedBy", fields: [addedById], references: [id])
+  BlogCategory   BlogsCategory? @relation(fields: [blogCategoryId], references: [id])
+  DeleteddBy     User?          @relation("BlogDeletedBy", fields: [deletedById], references: [id])
+  ModifiedBy     User?          @relation("BlogModifiedBy", fields: [modifiedById], references: [id])
+}
+
+model BlogImages {
+  id           Int     @id @default(autoincrement())
+  uuid         String  @unique @default(uuid()) @db.VarChar(255)
+  title        String? @db.VarChar(255)
+  file         String  @db.VarChar(255)
+  fileType     String? @db.VarChar(100)
+  videoPreview String? @db.VarChar(255)
+  path         String? @db.VarChar(500)
+  blogId       Int?
+  isDeleted    Boolean @default(false)
+  isPublished  Boolean @default(true)
+  Blog         Blogs?  @relation(fields: [blogId], references: [id], onDelete: Cascade)
+}
+
+model MailSentLogs {
+  id            Int      @id @default(autoincrement())
+  subject       String   @db.VarChar(255)
+  calleFunction String?  @db.VarChar(255)
+  email         String   @db.VarChar(255)
+  data          Json?
+  template      String?  @db.VarChar(255)
+  addedDate     DateTime @default(now())
+}
+
+model OtpCodes {
+  id            Int      @id @default(autoincrement())
+  phoneCode     String?  @db.VarChar(10)
+  phone         String?  @db.VarChar(20)
+  email         String?  @db.VarChar(50)
+  otp           String?  @db.VarChar(10)
+  status        Int      @default(1)
+  active        Boolean  @default(true)
+  used          Boolean  @default(false)
+  addedDate     DateTime @default(now())
+  deviceType    String?  @db.VarChar(50)
+  deviceId      String?  @db.VarChar(50)
+  deviceVersion String?  @db.VarChar(20)
+  userAgent     String?  @db.VarChar(255)
+  userIP        String?  @db.VarChar(50)
+  attempts      Int      @default(0)
+}
+
+model emailLookupsLog {
+  id        Int      @id @default(autoincrement())
+  email     String?  @db.VarChar(50)
+  status    Int      @default(1)
+  userAgent String?  @db.VarChar(255)
+  userIP    String?  @db.VarChar(50)
+  attempts  Int      @default(0)
+  addedDate DateTime @default(now())
+}
+
+model AlertsType {
+  id                Int                 @id @default(autoincrement())
+  slug              String              @unique @db.VarChar(255)
+  title             String              @db.VarChar(255)
+  description       String?
+  forAdminpanel     Boolean             @default(false)
+  isPublished       Boolean             @default(true)
+  isDeleted         Boolean             @default(false)
+  addedDate         DateTime            @default(now())
+  UserAlertsSetting UserAlertsSetting[]
+}
+
+model UserAlertsSetting {
+  id           Int         @id @default(autoincrement())
+  userId       Int?
+  alertsTypeId Int?
+  desktop      Boolean     @default(true)
+  mobile       Boolean     @default(false)
+  email        Boolean     @default(true)
+  app          Boolean     @default(true)
+  addedDate    DateTime    @default(now())
+  modifiedDate DateTime?
+  AlertsType   AlertsType? @relation(fields: [alertsTypeId], references: [id], onDelete: Cascade)
+  User         User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, alertsTypeId])
+}
+
+model SmsConfiguration {
+  id           Int      @id @default(autoincrement())
+  slug         String   @db.VarChar(255)
+  title        String   @db.VarChar(255)
+  gateway      String?  @db.VarChar(255)
+  appId        String?  @db.VarChar(255)
+  appPassword  String?  @db.VarChar(255)
+  senderId     String?  @db.VarChar(255)
+  senderIdType SMSType  @default(P)
+  test         Boolean  @default(false)
+  priority     Int      @default(9)
+  isDefault    Boolean  @default(false)
+  isPublished  Boolean  @default(true)
+  isDeleted    Boolean  @default(false)
+  countryId    Int?
+  addedDate    DateTime @default(now())
+  addedById    Int?
+  AddedBy      User?    @relation(fields: [addedById], references: [id])
+  Country      Country? @relation(fields: [countryId], references: [id])
+
+  @@unique([slug, senderIdType])
+}
+
+model SmsLogs {
+  id            Int      @id @default(autoincrement())
+  uuid          String   @unique @default(uuid())
+  gateway       String   @db.VarChar(255)
+  number        String?  @db.VarChar(255)
+  message       String?
+  status        String?  @default("sent") @db.VarChar(100)
+  remarks       String?  @db.VarChar(255)
+  error         String?
+  transactionId String?  @db.VarChar(255)
+  referenceId   String?  @db.VarChar(255)
+  sentDate      DateTime @default(now())
+  userId        Int?
+}
+
+
+model PaymentGateway {
+  id                Int       @id @default(autoincrement())
+  title             String    @db.VarChar(255)
+  slug              String    @unique @db.VarChar(255)
+  gatewayURL        String?   @db.VarChar(255)
+  gatewayPublicKey  String?   @db.VarChar(500)
+  gatewayPrivateKey String?   @db.VarChar(500)
+  storeId           String?
+  test              Boolean   @default(false)
+  isPublished       Boolean   @default(true)
+  isDeleted         Boolean   @default(false)
+  countryId         Int?
+  isDefault         Boolean   @default(false)
+  addedDate         DateTime  @default(now())
+  addedById         Int?
+  modifiedDate      DateTime?
+  modifiedById      Int?
+  deletedDate       DateTime?
+  deletedById       Int?
+  AddedBy           User?     @relation("PaymentGatewayAddedBy", fields: [addedById], references: [id])
+  Country           Country?  @relation(fields: [countryId], references: [id])
+  DeletedBy         User?     @relation("PaymentGatewayDeletedBy", fields: [deletedById], references: [id])
+  ModifiedBy        User?     @relation("PaymentGatewayModifiedBy", fields: [modifiedById], references: [id])
+}
+
+model SavedSearches {
+  id             Int                     @id @default(autoincrement())
+  title          String                  @db.VarChar(255)
+  userId         Int?
+  filters        Json?
+  icon           String?                 @db.VarChar(255)
+  forAdminpanel  Boolean                 @default(true)
+  visibility     SavedSearchesVisibility @default(self)
+  organizationId Int?
+  isPrivate      Boolean                 @default(false)
+  addedDate      DateTime                @default(now())
+  modifiedDate   DateTime?
+  isPublished    Boolean                 @default(true)
+  isDeleted      Boolean                 @default(false)
+  User           User?                   @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id           Int              @id @default(autoincrement())
+  slug         String?          @db.VarChar(255)
+  icon         String?          @db.VarChar(255)
+  message      String?          @db.VarChar(500)
+  link         String?          @db.VarChar(255)
+  file         String?          @db.VarChar(255)
+  departmentId Int?
+  addedDate    DateTime         @default(now())
+  modifiedDate DateTime?
+  isActive     Boolean          @default(true)
+  type         NotificationType @default(user)
+  mode         NotificationMode @default(auto)
+  linkLabel    String?          @db.VarChar(100)
+  Department   Department?      @relation(fields: [departmentId], references: [id])
+  Subscribers  Subscribers[]
+}
+
+model Subscribers {
+  userId         Int
+  notificationId Int
+  modifiedDate   DateTime     @default(now())
+  read           Boolean      @default(false)
+  Notifications  Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  User           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([notificationId, userId])
+}
+
+model Authorities {
+  id           Int            @id @default(autoincrement())
+  title        String         @db.VarChar(255)
+  slug         String         @unique @db.VarChar(255)
+  isPublished  Boolean        @default(true)
+  isDeleted    Boolean        @default(false)
+  addedDate    DateTime       @default(now())
+  Permits      Permit[]
+  Transactions Transactions[]
+}
+
+model ProjectComponent {
+  id           Int            @id @default(autoincrement())
+  title        String         @db.VarChar(255)
+  slug         String         @unique @db.VarChar(255)
+  isPublished  Boolean        @default(true)
+  isDeleted    Boolean        @default(false)
+  addedDate    DateTime       @default(now())
+  DailyRoutine DailyRoutine[]
+}
+
+model ProjectType {
+  id          Int       @id @default(autoincrement())
+  title       String    @db.VarChar(255)
+  slug        String    @unique @db.VarChar(255)
+  isPublished Boolean   @default(true)
+  isDeleted   Boolean   @default(false)
+  addedDate   DateTime  @default(now())
+  Enquiry     Enquiry[]
+  Leads       Leads[]
+  Project     Project[]
+}
+
+model ProjectState {
+  id                  Int                   @id @default(autoincrement())
+  title               String                @db.VarChar(255)
+  slug                String                @unique @db.VarChar(255)
+  shouldCloseProject  Boolean               @default(false)
+  order               Int                   @default(9)
+  isPublished         Boolean               @default(true)
+  isDeleted           Boolean               @default(false)
+  addedDate           DateTime              @default(now())
+  isDefault           Boolean               @default(false)
+  bgColor             String?               @db.VarChar(255)
+  textColor           String?               @db.VarChar(255)
+  Project             Project[]
+  ProjectEnableStates ProjectEnableStates[]
+}
+
+model ProjectEnableStates {
+  id           Int          @id @default(autoincrement())
+  Project      Project      @relation(fields: [pId], references: [id])
+  pId          Int
+  ProjectState ProjectState @relation(fields: [pstateId], references: [id])
+  pstateId     Int
+
+  @@unique([pId, pstateId])
+}
+
+model payment {
+  id             Int      @id @default(autoincrement())
+  status         String   // This could be a string enum or a string field.
+  projectId        Int      // Assuming you're tracking payment by some order or project ID.
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Project {
+  id                     Int                     @id @default(autoincrement())
+  slug                   String                  @unique @default(uuid()) @db.VarChar(255)
+  title                  String                  @db.VarChar(255)
+  submissionById         Int?
+  clientId               Int?
+  projectTypeId          Int?
+  instructions           String?
+  projectFilesLink       String?
+  priority               Int                     @default(3)
+  startDate              DateTime?
+  endDate                DateTime?
+  isExtended             Boolean                 @default(false)
+  reasonOfExtension      String?                 @db.VarChar(255)
+  projectStateId         Int?
+  isDeleted              Boolean                 @default(false)
+  isClosed               Boolean                 @default(false)
+  addedById              Int?
+  modifiedById           Int?
+  deletedById            Int?
+  addedDate              DateTime                @default(now())
+  modifiedDate           DateTime?
+  deletedDate            DateTime?
+  
+  comment                String?                 @db.VarChar(500)
+  onHold                 Boolean                 @default(false)
+  referenceNumber        String?                 @db.VarChar(50)
+  projectHoldById        Int?
+  xeroReference          String?                 @unique @db.VarChar(255)
+  projectEstimate  Float?
+  xeroTenantId           String?                 @db.VarChar(255)
+      deadlineUtc    DateTime?
+  // New fields from Xero API response
+
+
+
+  depositAmount Float? 
+
+  totalInvoiced Float? 
+  minutesLogged         Int?                     @default(0)
+
+
+  CarReservationRequest  CarReservationRequest[]
+  dailyRoutine           DailyRoutine[]
+  Resources             FileManagement[]
+  FileshareLogs         FileshareLogs[]
+  Invoice               Invoice[]
+  Permits               Permit[]
+  AddedBy               User?                   @relation("ProjectAddedBy", fields: [addedById], references: [id])
+  Client                Client?                 @relation(fields: [clientId], references: [id])
+  DeletedBy             User?                   @relation("ProjectDeletedBy", fields: [deletedById], references: [id])
+  leadId                 Int?                    @unique
+  Lead                  Leads?                  @relation(fields: [leadId], references: [id])
+  ModifiedBy            User?                   @relation("ProjectModifiedBy", fields: [modifiedById], references: [id])
+ProjectHoldBy          User?                   @relation("ProjectHoldBy", fields: [projectHoldById], references: [id])
+  ProjectState          ProjectState?           @relation(fields: [projectStateId], references: [id])
+  ProjectType           ProjectType?            @relation(fields: [projectTypeId], references: [id])
+  SubmissionBy          Organization?           @relation("ProjectSubmittedBy", fields: [submissionById], references: [id])
+  ProjectClient         ProjectClient[]
+  ProjectConversation    ProjectConversation[]
+  ProjectMembers        ProjectMembers[]
+  Quotation             Quotation[]
+  Task                  Task[]
+  Transactions          Transactions[]
+  ProjectEnableStates   ProjectEnableStates[]
+}
+
+model ProjectMembers {
+  id          Int     @id @default(autoincrement())
+  userId      Int
+  projectId   Int
+  projectRole Int     @default(2)
+  Project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  User        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+}
+
+
+model PaymentTerm {
+  id     Int                @id @default(autoincrement())
+  term   String
+  status PaymentTermsStatus
+}
+
+enum PaymentTermsStatus {
+  NotStarted
+  InProgress
+  Completed
+  Overdue
+}
+
+
+model ProjectClient {
+  id               Int     @id @default(autoincrement())
+  clientId         Int
+  projectId        Int
+  isRepresentative Boolean @default(false)
+  Client           Client  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  Project          Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, clientId])
+}
+
+model FileManagement {
+  id                    Int                  @id @default(autoincrement())
+  uuid                  String               @unique @default(uuid()) @db.VarChar(255)
+  documentType          String?              @db.VarChar(255)
+  title                 String?              @db.VarChar(255)
+  file                  String               @db.VarChar(255)
+  fileType              String?              @db.VarChar(100)
+  name                  String?              @db.VarChar(255)
+  path                  String?              @db.VarChar(500)
+  description           String?
+  order                 Int                  @default(99)
+  comments              String?              @db.VarChar(500)
+  visibility            FileVisibility       @default(organization)
+  projectId             Int?
+  taskId                Int?
+  isTemp                Boolean              @default(false)
+  status                Int?
+  isDeleted             Boolean              @default(false)
+  isDefault             Boolean              @default(false)
+  isProcessing          Boolean              @default(false)
+  backgroundId          Int?
+  addedDate             DateTime             @default(now())
+  modifiedDate          DateTime?
+  deletedDate           DateTime?
+  addedById             Int?
+  deletedById           Int?
+  modifiedById          Int?
+  projectConversationId Int?
+  permitId              Int?
+  fileSize              Float                @default(0)
+  AddedBy               User?                @relation("FileAddedBy", fields: [addedById], references: [id])
+  DeletedBy             User?                @relation("FileDeletedBy", fields: [deletedById], references: [id])
+  ModifiedBy            User?                @relation("FileModifiedBy", fields: [modifiedById], references: [id])
+  Permit                Permit?              @relation(fields: [permitId], references: [id])
+  ProjectConversation   ProjectConversation? @relation(fields: [projectConversationId], references: [id])
+  Project               Project?             @relation(fields: [projectId], references: [id])
+  Task                  Task?                @relation(fields: [taskId], references: [id])
+  FileshareLogs         FileshareLogs[]
+}
+
+model FileshareLogs {
+  id          Int            @id @default(autoincrement())
+  clientId    Int
+  sharedById  Int
+  addedDate   DateTime       @default(now())
+  projectId   Int
+  fileId      Int
+  batchNumber Int            @default(1)
+  Client      Client         @relation(fields: [clientId], references: [id])
+  file        FileManagement @relation(fields: [fileId], references: [id])
+  Project     Project        @relation(fields: [projectId], references: [id])
+  SharedBy    User           @relation(fields: [sharedById], references: [id])
+}
+
+model ProjectConversation {
+  id           Int                          @id @default(autoincrement())
+  projectId    Int?
+  message      String?
+  userId       Int?
+  isDeleted    Boolean                      @default(false)
+  addedDate    DateTime                     @default(now())
+  modifiedDate DateTime?
+  Media        FileManagement[]
+  Project      Project?                     @relation(fields: [projectId], references: [id])
+  User         User?                        @relation(fields: [userId], references: [id])
+  ReadLog      ProjectConversationReadLog[]
+}
+
+model ProjectConversationReadLog {
+  conversationId Int
+  userId         Int
+  read           Boolean             @default(false)
+  Conversation   ProjectConversation @relation(fields: [conversationId], references: [id])
+  User           User                @relation(fields: [userId], references: [id])
+
+  @@unique([conversationId, userId])
+}
+
+model Task {
+  id                Int              @id @default(autoincrement())
+  uuid              String           @default(uuid()) @db.VarChar(255)
+  title             String           @db.VarChar(255)
+  priority          Int              @default(3)
+  instructions      String?
+  taskStartFrom     DateTime?
+  taskEndOn         DateTime?
+  hasExtendedDate   Boolean          @default(false)
+  extendedDate      DateTime?
+  reasonOfExtension String?
+  addedById         Int?
+  closedById        Int?
+  status            Int              @default(1)
+  addedDate         DateTime         @default(now())
+  isDeleted         Boolean          @default(false)
+  order             Int              @default(999)
+  projectId         Int?
+  type              Int              @default(1)
+  Resources         FileManagement[]
+  AddedBy           User?            @relation("TaskAddedBy", fields: [addedById], references: [id])
+  ClosedBy          User?            @relation("TaskClosedBy", fields: [closedById], references: [id])
+  Project           Project?         @relation(fields: [projectId], references: [id])
+  TaskMembers       TaskMembers[]
+}
+
+model TaskMembers {
+  id     Int  @id @default(autoincrement())
+  userId Int
+  taskId Int
+  Task   Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  User   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model DailyRoutine {
+  id           Int               @id @default(autoincrement())
+  remarks      String?
+  noOfHours    Float             @default(0)
+  projectId    Int?
+  isPublished  Boolean           @default(true)
+  isDeleted    Boolean           @default(false)
+  addedDate    DateTime          @default(now())
+  modifiedDate DateTime?
+  userId       Int?
+  taskTypeId   Int?
+  Project      Project?          @relation(fields: [projectId], references: [id])
+  TaskType     ProjectComponent? @relation(fields: [taskTypeId], references: [id])
+  User         User?             @relation(fields: [userId], references: [id])
+}
+
+model Department {
+  id                             Int                              @id @default(autoincrement())
+  title                          String                           @db.VarChar(255)
+  slug                           String                           @unique @db.VarChar(255)
+  isPublished                    Boolean                          @default(true)
+  isDeleted                      Boolean                          @default(false)
+  addedDate                      DateTime                         @default(now())
+  AdminAction                    AdminAction[]
+  Notification                   Notification[]
+  OrganizationDepartmentRelation OrganizationDepartmentRelation[]
+  Employees                      User[]
+}
+
+model OrganizationDepartmentRelation {
+  id               Int          @id @default(autoincrement())
+  departmentId     Int
+  organizationId   Int
+  departmentHeadId Int?
+  DepartmentHead   User?        @relation(fields: [departmentHeadId], references: [id])
+  Department       Department   @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  Organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, departmentId])
+}
+
+model Enquiry {
+  id                  Int                   @id @default(autoincrement())
+  uuid                String?               @unique @default(uuid()) @db.VarChar(255)
+  name                String                @db.VarChar(100)
+  slug                String                @db.VarChar(100)
+  email               String?               @db.VarChar(100)
+  phone               String?               @db.VarChar(100)
+  phoneCode           String?               @db.VarChar(10)
+  message             String?
+  source              String?               @db.VarChar(100)
+  userAgent           String?               @db.VarChar(255)
+  userIP              String?               @db.VarChar(50)
+  reference           String?               @db.VarChar(100)
+  isDeleted           Boolean               @default(false)
+  status              Int                   @default(1)
+  addedDate           DateTime              @default(now())
+  hasReplied          Boolean               @default(false)
+  timeDifference      Int?                  @default(43200)
+  repliedDate         DateTime?
+  modifiedDate        DateTime?
+  addedById           Int?
+  modifiedById        Int?
+  assignedById        Int?
+  assignedToId        Int?
+  projectTypeId       Int?
+  AddedBy             User?                 @relation("EnquiryAddedBy", fields: [addedById], references: [id])
+  AssignedBy          User?                 @relation("EnquiryAssignedBy", fields: [assignedById], references: [id])
+  AssignedTo          User?                 @relation("EnquiryAssignedTo", fields: [assignedToId], references: [id])
+  ModifiedBy          User?                 @relation("EnquiryModifiedBy", fields: [modifiedById], references: [id])
+  ProjectType         ProjectType?          @relation(fields: [projectTypeId], references: [id])
+  Attachments         EnquiryAttachment[]
+  LeadEnquiryFollowUp LeadEnquiryFollowUp[]
+  Leads               Leads?
+}
+
+model EnquiryAttachment {
+  id              Int      @id @default(autoincrement())
+  title           String?  @db.VarChar(255)
+  file            String?  @db.VarChar(255)
+  mimeType        String?  @db.VarChar(100)
+  addedDate       DateTime @default(now())
+  enquiryId       Int?
+  leadId          Int?
+  isDeleted       Boolean  @default(false)
+  fileSize        Float    @default(0)
+  syncWithProject Boolean  @default(true)
+  Enquiry         Enquiry? @relation(fields: [enquiryId], references: [id])
+  Lead            Leads?   @relation(fields: [leadId], references: [id])
+}
+
+model LeadEnquiryFollowUp {
+  id         Int      @id @default(autoincrement())
+  note       String
+  addedDate  DateTime @default(now())
+  addedById  Int
+  enquiryId  Int?
+  leadId     Int?
+  isDeleted  Boolean  @default(false)
+  isConcern  Boolean  @default(false)
+  isResolved Boolean  @default(false)
+  AddedBy    User     @relation(fields: [addedById], references: [id], onDelete: Cascade)
+  Enquiry    Enquiry? @relation(fields: [enquiryId], references: [id], onDelete: Cascade)
+  Lead       Leads?   @relation(fields: [leadId], references: [id], onDelete: Cascade)
+}
+
+model Leads {
+  id                    Int                   @id @default(autoincrement())
+  uuid                  String?               @unique @default(uuid()) @db.VarChar(255)
+  message               String?
+  status                Int                   @default(1)
+  addedDate             DateTime              @default(now())
+  repliedDate           DateTime?
+  modifiedDate          DateTime?
+  modifiedById          Int?
+  addedById             Int?
+  clientId              Int?
+  projectTypeId         Int?
+  representativeId      Int?
+  enquiryId             Int?                  @unique
+  assignedById          Int?
+  assignedToId          Int?
+  isDeleted             Boolean               @default(false)
+  submissionById        Int?
+  dueDateForSubmissions DateTime?
+  xeroTenantId          String?               @db.VarChar(255)
+  Attachments           EnquiryAttachment[]
+  LeadEnquiryFollowUp   LeadEnquiryFollowUp[]
+  AddedBy               User?                 @relation("LeadAddedBy", fields: [addedById], references: [id])
+  AssignedBy            User?                 @relation("LeadAssignedBy", fields: [assignedById], references: [id])
+  AssignedTo            User?                 @relation("LeadAssignedTo", fields: [assignedToId], references: [id])
+  Client                Client?               @relation(fields: [clientId], references: [id])
+  Enquiry               Enquiry?              @relation(fields: [enquiryId], references: [id])
+  ModifiedBy            User?                 @relation("LeadModifiedBy", fields: [modifiedById], references: [id])
+  ProjectType           ProjectType?          @relation(fields: [projectTypeId], references: [id])
+  Representative        Client?               @relation("LeadRepresentative", fields: [representativeId], references: [id])
+  SubmissionBy          Organization?         @relation(fields: [submissionById], references: [id])
+  Project               Project?
+  Quotation             Quotation[]
+}
+
+model Quotation {
+  id                          Int                  @id @default(autoincrement())
+  leadId                      Int?
+  scopeOfWork                 String?
+  file                        String?              @db.VarChar(255)
+  type                        Int                  @default(1)
+  status                      Int                  @default(1)
+  isDeleted                   Boolean              @default(false)
+  addedDate                   DateTime             @default(now())
+  sentDate                    DateTime?
+  modifiedDate                DateTime?
+  addedById                   Int?
+  modifiedById                Int?
+  paymentTerms                String?
+  hasSupervision              Boolean              @default(false)
+  supervisionMonthlyCharge    Float                @default(0)
+  supervisionPaymentSchedule  Int                  @default(1)
+  projectId                   Int?
+  expiryDate                  DateTime?
+  revisedQuotationReferenceId Int?
+  revisionCount               Int                  @default(0)
+  subTotal                    Float                @default(0)
+  total                       Float                @default(0)
+  vatAmount                   Float                @default(0)
+  xeroReference               String?              @unique @db.VarChar(255)
+  quoteNumber                 String?              @db.VarChar(255)
+  brandingThemeId             Int?
+  issueDate                   DateTime?
+  xeroTenantId                String?              @db.VarChar(255)
+  note                        String?
+  Invoice                     Invoice[]
+  AddedBy                     User?                @relation("QuotationAddedBy", fields: [addedById], references: [id])
+  BrandingTheme               BrandingTheme?       @relation(fields: [brandingThemeId], references: [id])
+  Lead                        Leads?               @relation(fields: [leadId], references: [id])
+  ModifiedBy                  User?                @relation("QuotationModifiedBy", fields: [modifiedById], references: [id])
+  Project                     Project?             @relation(fields: [projectId], references: [id])
+  RevisedQuotationReference   Quotation?           @relation("InitialQuotation", fields: [revisedQuotationReferenceId], references: [id])
+  InitialQuotation            Quotation[]          @relation("InitialQuotation")
+  QuotationMilestone          QuotationMilestone[]
+}
+
+model QuotationMilestone {
+  id             Int        @id @default(autoincrement())
+  title          String?
+  quotationId    Int?
+  status         Int        @default(1)
+  invoiceId      Int?
+  completedById  Int?
+  amount         Float      @default(0)
+  quantity       Int        @default(1)
+  requirePayment Boolean    @default(false)
+  xeroReference  String?    @unique @db.VarChar(255)
+  accountId      Int?
+  productId      Int?
+  taxAmount      Float      @default(0)
+  taxRateId      Int?
+  Account        Account?   @relation(fields: [accountId], references: [id])
+  CompletedBy    User?      @relation(fields: [completedById], references: [id])
+  Invoice        Invoice?   @relation(fields: [invoiceId], references: [id])
+  Product        Product?   @relation(fields: [productId], references: [id])
+  Quotation      Quotation? @relation(fields: [quotationId], references: [id])
+  TaxRate        TaxRate?   @relation(fields: [taxRateId], references: [id])
+}
+
+model Invoice {
+  id                   Int                  @id @default(autoincrement())
+  title                String?              @db.VarChar(255)
+  message              String?
+  projectId            Int?
+  vatAmount            Float                @default(0)
+  total                Float                @default(0)
+  status               Int                  @default(1)
+  file                 String?              @db.VarChar(255)
+  isDeleted            Boolean              @default(false)
+  addedDate            DateTime             @default(now())
+  sentDate             DateTime?
+  modifiedDate         DateTime?
+  addedById            Int?
+  modifiedById         Int?
+  clientId             Int?
+  type                 Int                  @default(1)
+  hasSupervisionCharge Boolean              @default(false)
+  quotationId          Int?
+  balance              Float                @default(0)
+  subTotal             Float                @default(0)
+  xeroReference        String?              @unique @db.VarChar(255)
+  invoiceNumber        String?              @db.VarChar(255)
+  expiryDate           DateTime?
+  issueDate            DateTime?
+  xeroTenantId         String?              @db.VarChar(255)
+  AddedBy              User?                @relation("InvoiceAddedBy", fields: [addedById], references: [id])
+  Client               Client?              @relation(fields: [clientId], references: [id])
+  ModifiedBy           User?                @relation("InvoiceModifiedBy", fields: [modifiedById], references: [id])
+  Project              Project?             @relation(fields: [projectId], references: [id])
+  Quotation            Quotation?           @relation(fields: [quotationId], references: [id])
+  InvoiceFollowUp      InvoiceFollowUp[]
+  InvoiceItems         InvoiceItem[]
+  QuotationMilestone   QuotationMilestone[]
+  Transactions         Transactions[]
+}
+
+model InvoiceItem {
+  id            Int      @id @default(autoincrement())
+  title         String?
+  amount        Float    @default(0)
+  invoiceId     Int?
+  quantity      Int      @default(1)
+  xeroReference String?  @unique @db.VarChar(255)
+  accountId     Int?
+  productId     Int?
+  taxAmount     Float    @default(0)
+  taxRateId     Int?
+  Account       Account? @relation(fields: [accountId], references: [id])
+  Invoice       Invoice? @relation(fields: [invoiceId], references: [id])
+  Product       Product? @relation(fields: [productId], references: [id])
+  TaxRate       TaxRate? @relation(fields: [taxRateId], references: [id])
+}
+
+model InvoiceFollowUp {
+  id         Int      @id @default(autoincrement())
+  note       String
+  isConcern  Boolean  @default(false)
+  isResolved Boolean  @default(false)
+  addedDate  DateTime @default(now())
+  addedById  Int?
+  invoiceId  Int?
+  isDeleted  Boolean  @default(false)
+  AddedBy    User?    @relation(fields: [addedById], references: [id], onDelete: Cascade)
+  Invoice    Invoice? @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model Transactions {
+  id                   Int          @id @default(autoincrement())
+  amount               Float        @default(0)
+  transactionDate      DateTime     @default(now())
+  status               Int          @default(1)
+  transactionReference String?      @db.VarChar(255)
+  addedDate            DateTime     @default(now())
+  addedById            Int?
+  projectId            Int?
+  clientId             Int?
+  modifiedById         Int?
+  modifiedDate         DateTime?
+  remarks              String?
+  title                String?      @db.VarChar(255)
+  assignedToId         Int?
+  authorityId          Int?
+  isDeleted            Boolean      @default(false)
+  receipt              String?      @db.VarChar(255)
+  invoiceId            Int?
+  xeroReference        String?      @unique @db.VarChar(255)
+  recordType           Int          @default(1)
+  AddedBy              User?        @relation("TransactionAddedBy", fields: [addedById], references: [id])
+  AssignedTo           User?        @relation("TransactionAssignedTo", fields: [assignedToId], references: [id])
+  Authority            Authorities? @relation(fields: [authorityId], references: [id])
+  Client               Client?      @relation(fields: [clientId], references: [id])
+  Invoice              Invoice?     @relation(fields: [invoiceId], references: [id])
+  ModifiedBy           User?        @relation("TransactionModifiedBy", fields: [modifiedById], references: [id])
+  Project              Project?     @relation(fields: [projectId], references: [id])
+}
+
+model Permit {
+  id            Int              @id @default(autoincrement())
+  clientId      Int?
+  projectId     Int?
+  authorityId   Int?
+  title         String?          @db.VarChar(255)
+  remarks       String?
+  financeStatus Int              @default(1)
+  clientStatus  Int              @default(1)
+  approvedDate  DateTime?
+  expiryDate    DateTime?
+  addedDate     DateTime         @default(now())
+  modifiedDate  DateTime?
+  isDeleted     Boolean          @default(false)
+  addedById     Int?
+  modifiedById  Int?
+  Resources     FileManagement[]
+  AddedBy       User?            @relation(fields: [addedById], references: [id])
+  Authority     Authorities?     @relation(fields: [authorityId], references: [id])
+  Client        Client?          @relation(fields: [clientId], references: [id])
+  ModifiedBy    User?            @relation("PermitModifiedBy", fields: [modifiedById], references: [id])
+  Project       Project?         @relation(fields: [projectId], references: [id])
+}
+
+model Reimbursement {
+  id                   Int                    @id @default(autoincrement())
+  requestById          Int?
+  approvedAmount       Float?
+  purpose              String?                @db.VarChar(500)
+  status               Int                    @default(1)
+  addedDate            DateTime               @default(now())
+  claimedAmount        Float?
+  isDeleted            Boolean                @default(false)
+  AdminActions         AdminAction[]
+  RequestBy            User?                  @relation(fields: [requestById], references: [id])
+  ReimbursementReceipt ReimbursementReceipt[]
+}
+
+model ReimbursementReceipt {
+  id              Int            @id @default(autoincrement())
+  title           String?        @db.VarChar(255)
+  file            String?        @db.VarChar(255)
+  claimedAmount   Float?         @default(0)
+  approvedAmount  Float?         @default(0)
+  status          Int            @default(1)
+  comment         String?        @db.VarChar(500)
+  addedDate       DateTime       @default(now())
+  reimbursementId Int?
+  mimeType        String?        @db.VarChar(100)
+  Reimbursement   Reimbursement? @relation(fields: [reimbursementId], references: [id])
+}
+
+model LeaveType {
+  id            Int            @id @default(autoincrement())
+  title         String         @db.VarChar(255)
+  slug          String         @unique @db.VarChar(255)
+  isPaid        Boolean        @default(false)
+  threshold     Int            @default(0)
+  thresholdType ThresholdType  @default(monthly)
+  addedDate     DateTime       @default(now())
+  isDeleted     Boolean        @default(false)
+  isPublished   Boolean        @default(true)
+  LeaveRequest  LeaveRequest[]
+}
+
+model LeaveCredits {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  daysCount Float    @default(0)
+  note      String?  @db.VarChar(255)
+  isDeleted Boolean  @default(false)
+  entryType Int      @default(1)
+  addedDate DateTime @default(now())
+  User      User     @relation(fields: [userId], references: [id])
+}
+
+model LeaveRequest {
+  id            Int                 @id @default(autoincrement())
+  requestById   Int?
+  leaveFrom     DateTime?
+  leaveTo       DateTime?
+  status        Int                 @default(1)
+  addedDate     DateTime            @default(now())
+  submittedDate DateTime?
+  purpose       String?
+  isPaid        Boolean             @default(false)
+  leaveTypeId   Int
+  totalDays     Float?              @default(0)
+  AdminActions  AdminAction[]
+  LeaveType     LeaveType           @relation(fields: [leaveTypeId], references: [id], onDelete: Cascade)
+  RequestBy     User?               @relation(fields: [requestById], references: [id])
+  Attachments   RequestAttachment[]
+}
+
+model CashAdvanceRequest {
+  id                   Int                      @id @default(autoincrement())
+  requestById          Int?
+  requestAmount        Float?
+  purpose              String?
+  approvedAmount       Float?
+  numberOfInstallments Int                      @default(0)
+  installmentAmount    Float                    @default(0)
+  status               Int                      @default(1)
+  addedDate            DateTime                 @default(now())
+  submittedDate        DateTime?
+  AdminActions         AdminAction[]
+  Installments         CashAdvanceInstallment[]
+  RequestBy            User?                    @relation(fields: [requestById], references: [id])
+  Attachments          RequestAttachment[]
+  
+}
+
+model CashAdvanceInstallment {
+  id                   Int                @id @default(autoincrement())
+  cashAdvanceRequestId Int
+  amount               Float              @default(0)
+  isPaid               Boolean            @default(false)
+  monthYear            DateTime?
+  paidDate             DateTime?
+  CashAdvanceRequest   CashAdvanceRequest @relation(fields: [cashAdvanceRequestId], references: [id])
+  PayrollDeduction     PayrollDeduction?
+}
+
+model CarReservationRequest {
+  id           Int                 @id @default(autoincrement())
+  requestById  Int?
+  projectId    Int?
+  companyCarId Int?
+  status       Int                 @default(1)
+  addedDate    DateTime            @default(now())
+  fromDate     DateTime?
+  purpose      String?             @db.VarChar(500)
+  toDate       DateTime?
+  AdminActions AdminAction[]
+  CompanyCar   CompanyAsset?       @relation(fields: [companyCarId], references: [id])
+  Project      Project?            @relation(fields: [projectId], references: [id])
+  RequestBy    User?               @relation(fields: [requestById], references: [id])
+  Attachments  RequestAttachment[]
+}
+
+model CompanyAsset {
+  id                    Int                     @id @default(autoincrement())
+  code                  String?                 @db.VarChar(50)
+  type                  Int                     @default(1)
+  assetName             String?                 @db.VarChar(255)
+  assetDetail           String?                 @db.VarChar(255)
+  quantity              Int?                    @default(1)
+  addedDate             DateTime                @default(now())
+  isPublished           Boolean                 @default(true)
+  isDeleted             Boolean                 @default(false)
+  branchId              Int?
+  AssetAllocation       AssetAllocation[]
+  CarReservationRequest CarReservationRequest[]
+  Branch                Organization?           @relation(fields: [branchId], references: [id])
+}
+
+model AssetAllocation {
+  id             Int           @id @default(autoincrement())
+  userId         Int?
+  quantity       Int?          @default(1)
+  addedDate      DateTime      @default(now())
+  companyAssetId Int?
+  label          String?       @db.VarChar(255)
+  CompanyAsset   CompanyAsset? @relation(fields: [companyAssetId], references: [id])
+  User           User?         @relation(fields: [userId], references: [id])
+}
+
+model RequestAttachment {
+  id                      Int                    @id @default(autoincrement())
+  title                   String?                @db.VarChar(255)
+  file                    String?                @db.VarChar(255)
+  addedDate               DateTime               @default(now())
+  leaveRequestId          Int?
+  carReservationRequestId Int?
+  cashAdvanceRequestId    Int?
+  mimeType                String?                @db.VarChar(100)
+  CarReservationRequest   CarReservationRequest? @relation(fields: [carReservationRequestId], references: [id])
+  CashAdvanceRequest      CashAdvanceRequest?    @relation(fields: [cashAdvanceRequestId], references: [id])
+  LeaveRequest            LeaveRequest?          @relation(fields: [leaveRequestId], references: [id])
+}
+
+model AdminAction {
+  id                      Int                    @id @default(autoincrement())
+  departmentId            Int?
+  actionById              Int?
+  status                  Int                    @default(1)
+  comment                 String?                @db.VarChar(500)
+  addedDate               DateTime               @default(now())
+  reimbursementId         Int?
+  leaveRequestId          Int?
+  carReservationRequestId Int?
+  cashAdvanceRequestId    Int?
+  ActionBy                User?                  @relation(fields: [actionById], references: [id])
+  CarReservationRequest   CarReservationRequest? @relation(fields: [carReservationRequestId], references: [id])
+  CashAdvanceRequest      CashAdvanceRequest?    @relation(fields: [cashAdvanceRequestId], references: [id])
+  Department              Department?            @relation(fields: [departmentId], references: [id])
+  LeaveRequest            LeaveRequest?          @relation(fields: [leaveRequestId], references: [id])
+  Reimbursement           Reimbursement?         @relation(fields: [reimbursementId], references: [id])
+}
+
+model BulkUploadFormat {
+  id            Int             @id @default(autoincrement())
+  title         String          @db.VarChar(255)
+  format        Json
+  sample        Json?
+  comment       String?         @db.VarChar(500)
+  addedDate     DateTime        @default(now())
+  BiometricsJob BiometricsJob[]
+}
+
+model BiometricsJob {
+  id                Int                @id @default(autoincrement())
+  file              String?            @db.VarChar(255)
+  status            Int                @default(1)
+  isDeleted         Boolean            @default(false)
+  addedById         Int?
+  addedDate         DateTime           @default(now())
+  comment           String?            @db.VarChar(255)
+  title             String?            @db.VarChar(255)
+  backgroundId      String?            @db.VarChar(50)
+  failed            Int                @default(0)
+  failedRecord      Json?
+  failedReport      Json?
+  mimeType          String?            @db.VarChar(100)
+  processeStartDate DateTime?
+  processedDate     DateTime?
+  processedFile     String?            @db.VarChar(255)
+  success           Int                @default(0)
+  totalRecords      Int                @default(0)
+  uploadFormatId    Int?
+  BiometricsChecks  BiometricsChecks[]
+  AddedBy           User?              @relation(fields: [addedById], references: [id])
+  UploadFormat      BulkUploadFormat?  @relation(fields: [uploadFormatId], references: [id], onDelete: Cascade)
+}
+
+model BiometricsChecks {
+  id              Int                  @id @default(autoincrement())
+  addedDate       DateTime             @default(now())
+  userId          Int?
+  mode            BiometricsChecksType @default(in)
+  addedById       Int?
+  biometricsJobId Int?
+  checkIn         DateTime?
+  type            Int                  @default(1)
+  isProcessed     Boolean              @default(false)
+  latitude        Float?
+  longitude       Float?
+  selfie          String?              @db.VarChar(255)
+  userAgent       String?              @db.VarChar(255)
+  userIP          String?              @db.VarChar(100)
+  modifiedById    Int?
+  modifiedDate    DateTime?
+  AddedBy         User?                @relation("BiometricsAddedBy", fields: [addedById], references: [id])
+  BiometricsJob   BiometricsJob?       @relation(fields: [biometricsJobId], references: [id])
+  ModifiedBy      User?                @relation("BiometricsModifiedBy", fields: [modifiedById], references: [id])
+  User            User?                @relation(fields: [userId], references: [id])
+
+  @@unique([userId, checkIn])
+}
+
+model PublicHoliday {
+  id        Int      @id @default(autoincrement())
+  title     String?
+  date      DateTime
+  addedById Int?
+  addedDate DateTime @default(now())
+  AddedBy   User?    @relation(fields: [addedById], references: [id])
+}
+
+model Attendance {
+  id                Int       @id @default(autoincrement())
+  userId            Int?
+  checkIn           DateTime?
+  checkOut          DateTime?
+  totalHours        Float?
+  note              String?   @db.VarChar(255)
+  addedDate         DateTime  @default(now())
+  type              Int       @default(1)
+  addedById         Int?
+  proRatedDeduction Float     @default(0)
+  staus             Int       @default(1)
+  modifiedById      Int?
+  modifiedDate      DateTime?
+  AddedBy           User?     @relation("AttendanceAddedBy", fields: [addedById], references: [id])
+  ModifiedBy        User?     @relation("AttendanceModifiedBy", fields: [modifiedById], references: [id])
+  User              User?     @relation(fields: [userId], references: [id])
+}
+
+model Feedback {
+  id           Int             @id @default(autoincrement())
+  type         Int             @default(1)
+  url          String?         @db.VarChar(100)
+  rating       Int             @default(1)
+  comment      String?
+  addedById    Int?
+  addedDate    DateTime        @default(now())
+  AddedBy      User?           @relation(fields: [addedById], references: [id])
+  Attatchments FeedbackFiles[]
+}
+
+model FeedbackFiles {
+  id         Int       @id @default(autoincrement())
+  file       String?   @db.VarChar(255)
+  addedDate  DateTime  @default(now())
+  feedbackId Int?
+  Feedback   Feedback? @relation(fields: [feedbackId], references: [id])
+}
+
+model Salary {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  amount    Float     @default(0)
+  startDate DateTime  @default(now())
+  endDate   DateTime?
+  isActive  Boolean   @default(true)
+  addedDate DateTime  @default(now())
+  Payrolls  Payroll[]
+  User      User      @relation(fields: [userId], references: [id])
+}
+
+model PayrollCycle {
+  id            Int       @id @default(autoincrement())
+  fromDate      DateTime?
+  toDate        DateTime?
+  addedDate     DateTime  @default(now())
+  processed     Boolean   @default(false)
+  processing    Boolean   @default(false)
+  failed        Int       @default(0)
+  failedReport  Json?
+  processedDate DateTime?
+  success       Int       @default(0)
+  Payrolls      Payroll[]
+}
+
+model Payroll {
+  id                            Int                @id @default(autoincrement())
+  monthYear                     DateTime?
+  userId                        Int
+  totalLates                    Float              @default(0)
+  toBeDeductedFromLeaveCredits  Float              @default(0)
+  file                          String?            @db.VarChar(255)
+  addedDate                     DateTime           @default(now())
+  isDeleted                     Boolean            @default(false)
+  manualCorrection              Float              @default(0)
+  modifiedById                  Int?
+  modifiedDate                  DateTime?
+  note                          String?            @db.VarChar(255)
+  otherAmount                   Float              @default(0)
+  paid                          Boolean            @default(false)
+  paidDate                      DateTime?
+  payrollCycleId                Int?
+  salaryAmount                  Float              @default(0)
+  salaryId                      Int?
+  toBeDeductedFromCurrentSalary Float              @default(0)
+  totalAbsences                 Float              @default(0)
+  totalDaysWorked               Float              @default(0)
+  totalDeduction                Float              @default(0)
+  totalIncompletes              Float              @default(0)
+  totalReceivable               Float              @default(0)
+  totalWorkingDays              Int                @default(0)
+  processing                    Boolean            @default(false)
+  totalDays                     Int                @default(0)
+  ModifiedBy                    User?              @relation("PayrollModifiedBy", fields: [modifiedById], references: [id])
+  PayrollCycle                  PayrollCycle?      @relation(fields: [payrollCycleId], references: [id])
+  Salary                        Salary?            @relation(fields: [salaryId], references: [id])
+  User                          User               @relation(fields: [userId], references: [id])
+  Deductions                    PayrollDeduction[]
+}
+
+model PayrollDeduction {
+  id            Int                     @id @default(autoincrement())
+  payrollId     Int?
+  installmentId Int?                    @unique
+  title         String                  @db.VarChar(255)
+  amount        Float                   @default(0)
+  Installment   CashAdvanceInstallment? @relation(fields: [installmentId], references: [id])
+  Payroll       Payroll?                @relation(fields: [payrollId], references: [id])
+}
+
+model DashboardElement {
+  id                Int                    @id @default(autoincrement())
+  title             String                 @db.VarChar(255)
+  slug              String                 @unique @db.VarChar(255)
+  isPublished       Boolean                @default(true)
+  isDeleted         Boolean                @default(false)
+  DashboardElements RoleDashboardElement[]
+}
+
+model RoleDashboardElement {
+  roleId             Int
+  dashboardElementId Int
+  order              Int              @default(9)
+  DashboardElement   DashboardElement @relation(fields: [dashboardElementId], references: [id], onDelete: Cascade)
+  Role               Role             @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, dashboardElementId])
+}
+
+model Account {
+  id                  Int                  @id @default(autoincrement())
+  accountCode         String               @db.VarChar(50)
+  xeroReference       String?              @unique @db.VarChar(255)
+  title               String?              @db.VarChar(255)
+  xeroType            String?              @db.VarChar(50)
+  description         String?
+  bankAccountNumber   String?              @db.VarChar(50)
+  showInExpenseClaims Boolean              @default(false)
+  xeroTenantId        String?              @db.VarChar(255)
+  InvoiceItem         InvoiceItem[]
+  Products            Product[]
+  QuotationMilestone  QuotationMilestone[]
+}
+
+model TaxRate {
+  id                 Int                  @id @default(autoincrement())
+  taxType            String               @db.VarChar(50)
+  title              String               @db.VarChar(255)
+  rate               Float                @default(0)
+  xeroTenantId       String?              @db.VarChar(255)
+  InvoiceItem        InvoiceItem[]
+  Products           Product[]
+  QuotationMilestone QuotationMilestone[]
+
+  @@unique([title, taxType, xeroTenantId])
+}
+
+model Product {
+  id                 Int                  @id @default(autoincrement())
+  xeroReference      String?              @unique @db.VarChar(255)
+  productCode        String               @db.VarChar(255)
+  title              String               @db.VarChar(255)
+  description        String?
+  quantity           Int                  @default(1)
+  unitPrice          Float                @default(0)
+  accountId          Int?
+  taxRateId          Int?
+  InvoiceItem        InvoiceItem[]
+  Account            Account?             @relation(fields: [accountId], references: [id])
+  TaxRate            TaxRate?             @relation(fields: [taxRateId], references: [id])
+  QuotationMilestone QuotationMilestone[]
+}
+
+model BrandingTheme {
+  id           Int         @id @default(autoincrement())
+  title        String?     @db.VarChar(255)
+  paymentTerms String?
+  Quotation    Quotation[]
+}
+
+model WorkingHours {
+  id           Int            @id @default(autoincrement())
+  title        String         @db.VarChar(255)
+  hours        Json?
+  addedDate    DateTime       @default(now())
+  Organization Organization[]
+}
+
+enum TokenTypes {
+  accessToken
+  refreshToken
+  signuptoken
+  emailSignupToken
+  phoneSignupToken
+  resetPasswordToken
+  changeUserPhoneEmailToken
+}
+
+enum ModulesVisibility {
+  organization
+  system
+}
+
+enum SMSType {
+  T
+  P
+}
+
+enum SavedSearchesVisibility {
+  self
+  global
+  organization
+}
+
+enum NotificationType {
+  broadcast
+  user
+  department
+}
+
+enum NotificationMode {
+  auto
+  manual
+}
+
+enum FileVisibility {
+  public
+  organization
+  self
+  client
+}
+
+enum ThresholdType {
+  monthly
+  yearly
+}
+
+enum BiometricsChecksType {
+  in
+  out
+}

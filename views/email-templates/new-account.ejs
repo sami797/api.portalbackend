@@ -1,0 +1,169 @@
+<%- include("layout/email-header") -%>
+<div class="welcome-text">
+    <div class="heading"> Hi <%= firstName %>,</div>
+    <div class="description">Welcome to Yallah Property, the one-stop shop for all your property needs. Have an exclusive experience with our premium features.</div>
+</div>
+<div class="how-to-container">
+    <p class="how-to-text">How to search Yallah Property</p>
+    <div class="how-to-card">
+        <img src="<%= process.env.IMAGE_CDN_URL %>public/assets/10.png" />
+        <div class="how-to-card-right">
+            <p class="card-title">Save time on searching</p>
+            <p class="card-description">Don't waste time repeating your old searches. Simply save your favorite properties or search criteria by tapping the star.</p>
+        </div>
+    </div>
+    <div class="how-to-card">
+        <img src="<%= process.env.IMAGE_CDN_URL %>public/assets/9.png" />
+        <div class="how-to-card-right">
+            <p class="card-title">Real-time property updates</p>
+            <p class="card-description">Get instant updates on the latest listings and best property deals from the leading real estate agents and agencies.</p>
+        </div>
+    </div>
+    <div class="how-to-card">
+        <img src="<%= process.env.IMAGE_CDN_URL %>public/assets/8.png" />
+        <div class="how-to-card-right">
+            <p class="card-title">Collection based on sorting</p>
+            <p class="card-description">Sort the given list of properties in accordance with your preferences, such as from lowest to highest-ranked properties.</p>
+        </div>
+    </div>
+    <a class="link-button" href="https://yallahproperty.ae/en" target="_blank">Start Searching</a>
+</div>
+<div class="effective-container">
+    <p class="effective-text">Effective tools for you</p>
+    <div class="effective-card">
+        <img src="<%= process.env.IMAGE_CDN_URL %>public/assets/14.png" />
+        <div class="effective-card-right">
+            <p class="card-title">Residential for rent</p>
+            <p class="card-description">Look for the perfect rental properties for long-term and short-term with flexible payment plans.</p>
+                <a class="link-button" href="https://yallahproperty.ae/en/residential-for-rent/all/uae" target="_blank">Search properties</a>
+        </div>
+    </div>
+    <div class="effective-card">
+        <img src="<%= process.env.IMAGE_CDN_URL %>public/assets/13.png" />
+        <div class="effective-card-right">
+            <p class="card-title">Residential for sale</p>
+            <p class="card-description">Compare the best mortgage deals available and find your ideal home at an affordable price with us.</p>
+                <a class="link-button" href="https://yallahproperty.ae/en/residential-for-sale/all/uae" target="_blank">Compare deals</a>
+        </div>
+    </div>
+    <div class="effective-card">
+        <img src="<%= process.env.IMAGE_CDN_URL %>public/assets/12.png" />
+        <div class="effective-card-right">
+            <p class="card-title">Commercial properties</p>
+            <p class="card-description">Find the perfect place to begin your business in the UAE's top locations with our expedient filters.</p>
+                <a class="link-button" href="https://yallahproperty.ae/en/commercial-for-sale/all/uae" target="_blank">Find office space</a>
+        </div>
+    </div>
+    <div class="effective-card">
+        <img src="<%= process.env.IMAGE_CDN_URL %>public/assets/11.png" />
+        <div class="effective-card-right">
+            <p class="card-title">Mortage calculator</p>
+            <p class="card-description">Calculate your estimated loan balance, monthly payments, and upfront expenses right away.</p>
+                <a class="link-button" href="https://yallahproperty.ae/en/mortgage-calculator" target="_blank">Calculate Your Estimated Loan</a>
+        </div>
+    </div>
+
+  
+</div>
+
+<style>
+  
+
+    .how-to-container {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        border-bottom: 5px solid #F2f2f2;
+    }
+
+    .how-to-container>.how-to-text {
+        font-size: 1rem;
+        color: rgba(19, 119, 72, 1);
+        font-weight: bold;
+    }
+
+    .how-to-card {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .how-to-card>img {
+        object-fit: contain;
+        height: 80px;
+        width: 80px;
+    }
+
+    .how-to-card-right>.card-title {
+        font-size: 0.9rem;
+        font-weight: bold;
+    }
+
+    .how-to-card-right>.card-description {
+        font-size: 0.9rem;
+    }
+    .how-to-container>.link-button{
+        display: flex;
+        justify-content: center;
+        margin: auto;
+        background-color: rgba(19, 119, 72, 1);
+        color: white;
+        width: 25%;
+        padding: 1rem;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        font-size: small;
+        text-decoration: none;
+    }
+
+    .effective-container {
+        padding: 1rem;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 0.75rem;
+    }
+    .effective-container>.effective-text{
+        width: 100%;
+        font-size: 1rem;
+        color: rgba(19, 119, 72, 1);
+        font-weight: bold;
+    }
+    .effective-card{
+        margin-bottom: 1rem;
+        width: 45%;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .effective-card-right>.card-title {
+        font-size: 0.9rem;
+        font-weight: bold;
+    }
+
+    .effective-card-right>.card-description {
+        font-size: 0.9rem;
+    }
+    .effective-card-right>.link-button{
+        display: flex;
+        justify-content: center;
+        margin: auto;
+        padding: 0.75rem;
+        border: 1px solid rgba(89, 89, 89, 1);
+        border-radius: 0.25rem;
+        cursor: pointer;
+        font-size: small;
+        text-decoration: none;
+        color: rgba(89, 89, 89, 1);;
+    }
+  
+    .effective-card>img{
+        object-fit: contain;
+        height: 80px;
+        width: 80px;
+    }
+</style>
+
+<%- include("layout/email-footer") -%>   

@@ -1,0 +1,82 @@
+<%- include("layout/email-header") -%>
+<style>
+
+    .message-container {
+        display: block;
+        margin: 10px auto;
+        min-height: 300px;
+        padding: 20px 15px;
+    }
+
+    .otp-block{
+        text-align: center;
+        display: block;
+        font-size: 32px;
+        font-weight: 600;
+        color: rgb(19, 119, 72);
+        letter-spacing: 5px;
+    }
+
+    .text{
+    color: rgba(89, 89, 89, 1);
+    font-size: 14px;
+    margin: 0;
+    line-height: 1.8;
+    font-weight: unset;
+    }
+
+    .text-left{
+        text-align: left;
+    }
+
+    table{
+        width: 600px;
+    }
+
+    table td, table th{
+        padding-bottom: 1em;
+        border-bottom: 1px solid #f2f2f2;
+        text-align: left;
+    }
+
+    table th{
+        width: 160px;
+    }
+
+    table td{
+        width: 440px;
+    }
+
+    .link-button{
+        background-color: rgba(19, 119, 72, 1);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        font-size: small;
+        text-decoration: none;
+    }
+</style>
+<div class="message-wrapper">
+    <div class="message-container">
+        <p class="text">Dear <%= clientData.name %>,</p>
+        <p class="text">We hope this email find you well. Please find the quotation for your request attached below.</p>
+        <table style="margin-top: 30px;">
+            <tr>
+                <th class="text">Project Summary:</th>
+                <td><p class="text" style="white-space: pre-line;" ><%= quotation?.scopeOfWork %></p></td>
+            </tr>
+            <tr>
+                <th class="text">Payment Terms:</th>
+                <td><p class="text" style="white-space: pre-line;" ><%= quotation?.paymentTerms %></p></td>
+            </tr>
+            <tr>
+                <th class="text">Total Amount (VAT Inclusive):</th>
+                <td><p class="text" style="white-space: pre-line;" >AED <%= quotation?.total.toFixed(2) %></p></td>
+            </tr>
+        </table>
+        <p class="text" style="margin-top: 200px; font-style: italic; font-size: 12px; text-decoration: underline;">Please be aware that this email address is a shared system inbox. Replying to this email may not directly reach one of our representatives. To ensure your message is received and addressed promptly, kindly continue the conversation in the previous email thread.
+        </p>
+    </div>
+</div>
+<%- include("layout/email-footer") -%>

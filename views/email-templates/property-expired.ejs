@@ -1,0 +1,178 @@
+<%- include("layout/email-header") -%>
+<%
+    function findPrice(property){
+        if(!property){ return ""}
+        if(property.category.slug === "residential-for-sale" || property.category.slug === "commercial-for-sale"){
+            return `${property.currency} ${new Intl.NumberFormat().format(property.fixedPrice)}`
+        }else{
+            if(property.yearlyPrice){
+                return `${new Intl.NumberFormat().format(property.yearlyPrice)} ${property.currency}/year`
+            }
+            else if(property.monthlyPrice){
+                return `${new Intl.NumberFormat().format(property.monthlyPrice)} ${property.currency}/month`
+            }
+            else if(property.weeklyPrice){
+                return `${new Intl.NumberFormat().format(property.weeklyPrice)} ${property.currency}/week`
+            }
+            else if(property.dailyPrice){
+                return `${new Intl.NumberFormat().format(property.dailyPrice)} ${property.currency}/day`
+            }
+        }
+    }
+%>
+<div class="welcome-text">
+    <div class="heading"> Hi <%= firstName %>,</div>
+    <div class="description">Below Properties are expired and as been removed from the listing. Please publish it again by logging to the portal. You may also set to autorenew such that system auto renews the listing when it is expired automatically.</div>
+    <a class="link-button" href="https://admin.yallahproperty.ae/properties" target="_blank">Manage Listing</a>
+    <div class="warning">Could not autorew below properties as auto renew is turned off</div>
+</div>
+        <div class="cards-container">
+            <% if(property && Array.isArray(property)){ for(const __p of property){ %>
+                <div class="card">
+                    <div class="card-left">
+                        <a target="_blank" href="https://yallahproperty.ae/en/property/<%= __p.slug %>">
+                            <img src="<%= process.env.IMAGE_CDN_URL %><%= __p.resources[0].path %>" />
+                        </a>
+                    </div>
+                    <div class="card-right">
+                        <h3><%= (__p.type && __p.type.localization) ? __p.type.localization[0].title : "" %></h3>
+                        <h3 class="price my-3"><%= findPrice(__p) %></h3>
+                        <p><%= (__p.propertyLocation && __p.propertyLocation[0].location && __p.propertyLocation[0].location.localization) ? __p.propertyLocation[0].location.localization[0].pathName : "" %></p>
+                        <p><%= (__p.localization && __p.localization[0]) ? __p.localization[0].title : "" %></p>
+                        <div class="amenities my-3">
+                            <% if( __p.bedrooms){ %>
+                                <div>
+                                    <img src="<%= process.env.IMAGE_CDN_URL %>public/assets/bed.png">
+                                    <span><%= __p.bedrooms %></span>
+                                </div>
+                            <% } %>
+                            <% if( __p.bathrooms){ %>
+                            <div>
+                                <img src="<%= process.env.IMAGE_CDN_URL %>public/assets/bath.png">
+                                <span><%= __p.bathrooms %></span>
+                            </div>
+                            <% } %>
+                            <% if( __p.size){ %>
+                                <div>
+                                    <img src="<%= process.env.IMAGE_CDN_URL %>public/assets/area.png">
+                                    <span><%= __p.size %> <%= __p.sizeUnit %> </span>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+                <% }} %>
+        </div>
+        <style>
+	
+            .welcome-banner{
+            background-color: rgba(228,0,43,0.1) !important;
+            color: rgba(228,0,43,1) !important;
+        }
+        .warning{
+            background-color: rgba(228,0,43,0.1);
+            color: rgba(228,0,43,1);
+            padding: 5px 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .link-button{
+                display: flex;
+                justify-content: center;
+                margin: auto;
+                background-color: rgba(19, 119, 72, 1);
+                color: white;
+                width: 25%;
+                padding: 1rem;
+                border-radius: 0.25rem;
+                cursor: pointer;
+                font-size: small;
+                text-decoration: none;
+            }
+            
+        .price{
+            font-size: 16px !important;
+            font-weight: 600 !important;
+        }
+        .cards-container{
+        padding: 1rem;
+        }
+        .card{
+        display: flex;
+        padding: 0.5rem;
+        margin-bottom: 10px;
+        /* width: 100%; */
+        border: 1px solid rgba(223, 225, 230, 1);
+        border-radius: 0.25rem;
+        }
+        .card-right{
+        display: block;
+        padding-left: 1rem;
+        }
+        .card-left img{
+        width: 200px;
+        height: 160px;
+        border-radius: 0.25rem;
+        object-fit: cover;
+        }
+        .card-right>h3{
+        color: rgba(19, 119, 72, 1);
+        font-size: 12px;
+        margin: 0;
+        font-weight: unset;
+        }
+        .card-right>h1{
+        color: rgba(19, 119, 72, 1);
+        font-size: 14px;
+        margin: 0;
+        }
+        .card-right>p{
+        color: rgba(171, 171, 171, 1);
+        font-size: 10px;
+        margin: 0;
+        }
+        .card-right>.amenities{
+        display: flex;
+        align-items: center;
+        }
+        
+        .card-right>.amenities>div{
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            padding-right: 10px;
+        }
+        
+        .card-right>.amenities img{
+            height: 18px;
+            width: 18px;
+            padding-right: 5px;
+            object-fit: contain;
+        }
+        
+        .card-right>.amenities span{
+        color: #555;
+        font-size: 12px;
+        font-weight: 400;
+        }
+        .card-right .link-button{
+        font-size: 12px;
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 0.25rem;
+        background-color: rgba(19, 119, 72, 1);
+        text-decoration: none;
+        }
+        
+        .my-3{
+            display: inline-block;
+            margin: 8px 0px !important;
+        }
+        
+        .my-2{
+            margin: 5px 0px;
+        }
+        
+                </style>
+<%- include("layout/email-footer") -%>       

@@ -1,0 +1,42 @@
+<%- include("layout/email-header") -%>
+<style>
+
+    .message-container{
+        display: block;
+        margin: 10px auto;
+        min-height: 300px;
+        padding: 20px 15px;
+        font-size: 14px;
+    }
+    .mt-50{
+        margin-top: 50px;
+    }
+    .text-center{
+        text-align: center;
+    }
+
+    .resetButton{
+font-size: 14px;
+color: #fff;
+padding: 10px 20px;
+border-radius: 0.25rem;
+background-color: rgba(19, 119, 72, 1);
+text-decoration: none;
+}
+</style>
+<div class="message-wrapper">
+    <div class="message-container">
+        <p class="mb-0">Hi <%= firstName %>,</p>
+    <p>Property <%= propertyId %> documents has been uploaded, please login to adminpanel to make an action</p>
+    <p class="text-center mt-50">
+        <a class="resetButton" target="_blank" href="<%= propertyLink %>">Make action</a>
+    </p>
+    <p class="mt-50">If you are not able to click the above link, kindly open the url below.</p>
+    <a href="<%= propertyLink %>"  target="_blank"><%= propertyLink %></a>
+    
+    <p>You are receiving this email because you have subscribed from Yallah adminpanel. You can manage your notifications from
+        <a href="https://admin.yallahproperty.ae/profile?tab=manage_notifications"  target="_blank">here</a>
+    </p>
+    </div>
+</div>
+<%- include("layout/email-footer") -%>

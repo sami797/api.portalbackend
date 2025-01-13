@@ -1,0 +1,576 @@
+<%- include("layout/email-header") -%>
+    <div class="trophy-container">
+        <div class="trophy">
+            <!-- <img src="<%= process.env.IMAGE_CDN_URL %>public/mail/trophy.png" class="trophy-image" alt="trophy" /> -->
+            <img src="<%= process.env.IMAGE_CDN_URL %><%= organization.logo %>" class="trophy-organization"
+                alt="Organization Logo">
+        </div>
+        <h2 class="organization">
+            <%= organization.localization[0].name %>
+        </h2>
+    </div>
+
+    <!--Overall Stats Section-->
+    <div>
+        <div class="stats">
+            <div class="views">
+                <div class="views-image img-container">
+                    <img src="<%= process.env.IMAGE_CDN_URL %>public/mail/impression-and-views.png" />
+                </div>
+                <h5 class="heading">Views</h5>
+                <p class="value">
+                    <%= Intl.NumberFormat("en", { notation: "compact" }).format(views) %>
+                </p>
+            </div>
+            <div class="leads">
+                <div class="leads-image img-container">
+                    <img src="<%= process.env.IMAGE_CDN_URL %>public/mail/leads.png" />
+                </div>
+                <h5 class="heading">Leads</h5>
+                <p class="value">
+                    <%= Intl.NumberFormat("en", { notation: "compact" }).format(totalLeads) %>
+                </p>
+            </div>
+            <div class="impressions">
+                <div class="impression-image img-container">
+                    <img src="<%= process.env.IMAGE_CDN_URL %>public/mail/impression-and-views.png" />
+                </div>
+                <h5 class="heading">Impressions</h5>
+                <p class="value">
+                    <%= Intl.NumberFormat("en", { notation: "compact" }).format(impression) %>
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+    <!--Content Stats Breakdown-->
+    <div class="stats-breakdown">
+        <img class="flag-and-search" src="<%= process.env.IMAGE_CDN_URL %>public/mail/flag.png" />
+
+        <div class="stats-breakdown-text">
+            <h4 class="stats-breakdown-heading">
+                Your property achievements of this week
+            </h4>
+            <% if(topLeadsProperties.length> 0 ){ %>
+            <div class="stats-breakdown-text-description">
+                <p class="stats-breakdown-sub-heading">
+                    Properties that received highest number of leads
+                </p>
+            </div>
+            <% } %>
+        </div>
+        <% if(topLeadsProperties.length> 0 ){ %>
+            <div class="growing-container">
+                <div class="growing-heading">
+                    <h6 class="growing-heading-item">Page</h6>
+                    <p class="growing-heading-item right">Leads</p>
+                </div>
+                <% topLeadsProperties.forEach((ele, index)=> { %>
+                    <div class="growing">
+                        <div>
+                            <a class="growing-link" href="https://yallahproperty.ae/en/property/<%= ele.slug %>">
+                                <%= ele.localization[0].title %>
+                            </a>
+                        </div>
+                        <p class="growing-value growing-value-bg-<%= index+1 %>">
+                            <%= ele.propertyLeadsTracking.length + ele.leads.length %>
+                        </p>
+                    </div>
+                    <hr class="growing-divider" />
+                    <% }) %>
+            </div>
+            <% } %>
+    </div>
+
+    <% if(topViewedProperties.length> 0 ){ %>
+        <!--How do people find you section-->
+        <div class="stats-breakdown">
+            <img class="flag-and-search" src="<%= process.env.IMAGE_CDN_URL %>public/mail/search.png" />
+
+            <div class="stats-breakdown-text">
+                <h4 class="stats-breakdown-heading">
+                    Top pages with highest views
+                </h4>
+            </div>
+
+            <div class="find-you-container">
+                <% topViewedProperties.forEach((ele, index)=> { %>
+                    <div class="find-you find-you-value-bg-<%= index+1 %>">
+                        <p class="find-you-title">
+                            <a href="https://yallahproperty.ae/en/property/<%= ele.property.slug %>">
+                                <%= ele.property.localization[0].title %>
+                            </a>
+                        </p>
+                        <p class="find-you-value">
+                            <%= ele.views %> views
+                        </p>
+                    </div>
+                    <% }) %>
+            </div>
+        </div>
+        <% } %>
+            <!--Top Performing Pages Section-->
+            <% if(topImpressionProperties.length> 0 ){ %>
+                <div>
+                    <div style="margin-top: 30px;">
+                        <h4 class="stats-breakdown-heading">
+                            Top impressions
+                        </h4>
+                    </div>
+
+                    <div class="growing-container growing-container-without-border top-performing-container">
+                        <div class="growing-heading">
+                            <h6 class="growing-heading-item">Page</h6>
+                            <p class="growing-heading-item right">Impressions</p>
+                        </div>
+                        <% topImpressionProperties.forEach((ele, index)=> { %>
+                            <div class="growing growing-top-performing">
+                                <a class="growing-link growing-link-top-performing"
+                                    href="https://yallahproperty.ae/en/property/<%= ele.property.slug %>">
+                                    <%= ele.property.localization[0].title %>
+                                </a>
+                                <p class="growing-top-value">
+                                    <%= ele.impression %>
+                                </p>
+                            </div>
+                            <hr class="growing-divider" />
+                            <% }) %>
+                    </div>
+                </div>
+                <% } %>
+                    <style>
+                        body {
+                            background-color: #f2f2f2;
+                            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                            color: rgba(89, 89, 89, 1);
+                        }
+
+                        .container {
+                            max-width: 500px;
+                            margin: 0 auto;
+                            background-color: white;
+                        }
+
+                        .header {
+                            display: flex;
+                            justify-content: center;
+                            margin: auto;
+                            padding: 2rem;
+                        }
+
+                        .performance-banner {
+                            background-color: rgba(19, 119, 72, 1);
+                            padding: 1rem;
+                            font-size: x-large;
+                            color: white;
+                            text-align: center;
+                            font-weight: 400;
+                            margin: 0;
+                        }
+
+                        .trophy-container {
+                            /* display: flex;
+        flex-direction: column; */
+                            /* align-items: center; */
+                            padding: 1rem;
+                            text-align: center;
+                        }
+
+                        .trophy {
+                            /* position: relative; */
+                            /* display: flex; */
+                            /* justify-content: center; */
+                            /* align-items: center; */
+                            background-image: url("<%= process.env.IMAGE_CDN_URL %>public/mail/trophy.png");
+                            background-size: contain;
+                            height: 100px;
+                            background-repeat: no-repeat;
+                            background-position: center;
+                            width: 100%;
+                            padding-top: 20px;
+                        }
+
+                        .trophy-image {
+                            width: 100px;
+                            height: 100px;
+                        }
+
+                        .trophy-organization {
+                            /* position: absolute; */
+                            /* width: auto;
+        height: auto; */
+                            max-width: 40px;
+                            max-height: 35px;
+                            margin: auto;
+                            /* top: 30%;
+        left: 50%; */
+                            /* transform: translate(-50%, -50%); */
+                        }
+
+                        .organization {
+                            font-size: 14px;
+                            color: rgba(19, 119, 72, 1);
+                            margin-top: 0.5rem;
+                            font-weight: 500;
+                        }
+
+                        .stats {
+                            display: flex;
+                            justify-content: space-between;
+                            padding: 0px 1rem 2rem 1rem;
+                        }
+
+                        .views,
+                        .leads,
+                        .impressions {
+                            display: block;
+                            align-items: center;
+                            justify-content: center;
+                            margin: auto;
+                            margin-top: 0px;
+                            width: 33%;
+                            text-align: center;
+                        }
+
+                        .heading {
+                            font-size: 12px;
+                            color: rgba(19, 119, 72, 1);
+                            margin: 0;
+                            margin-top: 15px;
+                            font-weight: 500;
+                        }
+
+                        .value {
+                            font-size: 24px;
+                            color: rgba(19, 119, 72, 1);
+                            font-weight: 500;
+                            margin: 0;
+                        }
+
+                        .views-icon,
+                        .leads-icon,
+                        .impressions-icon {
+                            padding: 0.5rem;
+                            border-radius: 50%;
+                            width: 25px;
+                            height: 25px;
+                            margin-bottom: 0.5rem;
+                        }
+
+                        .views-icon {
+                            background-color: #4285f4
+                        }
+
+                        .leads-icon {
+                            background-color: #ea4335;
+                        }
+
+                        .impressions-icon {
+                            background-color: #34a853
+                        }
+
+                        .stats-breakdown {
+                            display: block;
+                            text-align: center;
+                            justify-content: center;
+                            align-items: center;
+                            padding: 1rem;
+                        }
+
+                        .stats-breakdown-icon {
+                            background-color: #e8f0fe;
+                            padding: 0.5rem;
+                            border-radius: 50%;
+                            width: 25px;
+                            height: 25px;
+                        }
+
+                        .stats-breakdown-text {
+                            display: block;
+                            align-items: center;
+                            justify-content: center;
+                            margin: 0.5rem;
+                            text-align: center;
+                        }
+
+                        .stats-breakdown-text-description {
+                            margin-top: 1rem;
+                        }
+
+                        .stats-breakdown-heading {
+                            font-size: 22px;
+                            color: #3c4043;
+                            margin: 0.5rem;
+                            font-weight: 400;
+                            text-align: center;
+                        }
+
+                        .stats-breakdown-sub-heading {
+                            font-size: 16px;
+                            color: #3c4043;
+                            margin: 0;
+                            font-weight: 400;
+                            padding-bottom: 0.5rem;
+                            text-align: center;
+                        }
+
+                        .stats-breakdown-description {
+                            font-size: 12px;
+                            color: #9aa0a6;
+                            margin: 0;
+                            font-weight: 400;
+                        }
+
+                        .growing-container {
+                            border: 1px solid rgba(223, 225, 230, 1);
+                            border-radius: 8px;
+                            padding: 1rem;
+                            width: 80%;
+                            margin: 0 auto;
+                        }
+
+                        .growing-container-without-border {
+                            border: none;
+                        }
+
+                        .top-performing-container {
+                            width: 70%;
+                        }
+
+                        .growing-heading {
+                            display: flex;
+                            width: 100%;
+                            justify-content: space-between;
+                            align-items: center;
+                        }
+
+                        .growing-heading-item {
+                            font-size: 12px;
+                            margin: 0;
+                            font-weight: 400;
+                            color: #9aa0a6;
+                        }
+
+                        .growing-heading-item.right {
+                            margin-left: auto;
+                        }
+
+                        .growing {
+                            display: flex;
+                            width: 100%;
+                            align-items: center;
+                            justify-content: space-between;
+                        }
+
+                        .growing-link {
+                            font-size: 14px;
+                            margin: 0;
+                            text-align: left;
+                            font-weight: 500;
+                            color: #3c4043;
+                            text-decoration: none;
+                        }
+
+                        .growing-value {
+                            font-size: 14px;
+                            font-weight: 500;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            border-radius: 8px;
+                            color: #202124;
+                            height: 20px;
+                            min-width: 25px;
+                            width: 25px;
+                            text-align: center;
+                            max-width: 100px;
+                            margin: 0;
+                        }
+
+                        .growing-value-bg-1 {
+                            background-color: #8ab4f8;
+                            margin: 0.5rem 0px;
+                            padding: 1rem;
+                        }
+
+                        .growing-value-bg-2 {
+                            background-color: #c9ddff;
+                            margin: 0.5rem 0px;
+                            padding: 1rem;
+                        }
+
+                        .growing-value-bg-3 {
+                            background-color: #e8f0fe;
+                            margin: 0.5rem 0px;
+                            padding: 1rem;
+                        }
+
+                        .growing-value-bg-4 {
+                            background-color: #f0f5fc;
+                            margin-top: 0.5rem;
+                            margin-bottom: 0px;
+                            padding: 1rem;
+                        }
+
+                        .growing-divider {
+                            margin: 0;
+                            border: 0;
+                            width: 100%;
+                            height: 1px;
+                            background-color: #dadce0
+                        }
+
+                        .growing-top-performing {
+                            margin: 0.5rem 0px;
+                            display: flex;
+                            justify-content: space-between;
+                        }
+
+                        .growing-link-top-performing {
+                            font-size: 16px;
+                            font-weight: 400;
+                        }
+
+                        .growing-top-value {
+                            font-size: 12px;
+                            width: 40px;
+                            min-width: 40px;
+                            font-weight: 500;
+                            color: #202124;
+                            padding-left: 0.5rem;
+                            text-align: right;
+                        }
+
+                        .find-you-container {
+                            display: block;
+                            align-items: center;
+                            justify-content: center;
+                            margin: 0 auto;
+                            margin-top: 1rem;
+                            width: 80%;
+                        }
+
+                        .find-you {
+                            display: block;
+                            width: 100%;
+                            align-items: center;
+                            justify-content: space-between;
+                            text-align: center;
+                        }
+
+                        .find-you-title {
+                            font-size: 16px;
+                            font-weight: 400;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            border-radius: 8px;
+                            color: #202124;
+                            text-align: center;
+                            margin: 0;
+                        }
+
+                        .find-you-title a {
+                            color: #202124;
+                        }
+
+                        .find-you-value {
+                            font-size: 12px;
+                            font-weight: 400;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            border-radius: 8px;
+                            color: #202124;
+                            text-align: center;
+                            margin: 0;
+                            padding-top: 0.5rem;
+                        }
+
+
+                        .find-you-value-bg-1 {
+                            background-color: #8ab4f8;
+                            padding: 1rem;
+                            border-radius: 8px;
+                        }
+
+                        .find-you-value-bg-2 {
+                            background-color: #c9ddff;
+                            margin-top: 0.3rem;
+                            padding: 1rem;
+                            border-radius: 8px;
+                        }
+
+                        .find-you-value-bg-3 {
+                            background-color: #e8f0fe;
+                            margin-top: 0.3rem;
+                            margin-bottom: 0px;
+                            padding: 1rem;
+                            border-radius: 8px;
+                        }
+
+                        .find-you-value-bg-4 {
+                            background-color: #f0f5fc;
+                            margin-top: 0.3rem;
+                            margin-bottom: 0px;
+                            padding: 1rem;
+                            border-radius: 8px;
+                        }
+
+
+                        .footer {
+                            padding: 1rem;
+                            background-color: rgba(35, 36, 42, 1);
+                            color: #fff;
+                            display: block;
+                            align-items: center;
+                            text-align: center;
+                            font-size: 0.75rem;
+                        }
+
+                        .social-wrap {
+                            display: flex;
+                            gap: 1rem;
+                            align-items: center;
+                            margin: auto;
+                        }
+
+                        .img-container {
+                            height: 50px;
+                            width: 50px;
+                            margin: auto;
+                            background-color: #202124;
+                            border-radius: 50%;
+                            text-align: center;
+                        }
+
+                        .img-container img {
+                            padding: 9px;
+                            max-height: 30px;
+                            max-width: 30px;
+                            object-fit: contain;
+                        }
+
+                        .views-image {
+                            background-color: #4285f4;
+                        }
+
+                        .leads-image {
+                            background-color: #ea4335;
+                        }
+
+                        .impression-image {
+                            background-color: #34a853;
+                        }
+
+                        .flag-and-search {
+                            background-color: #e8f0fe;
+                            padding: 10px;
+                            display: inline-block;
+                            height: 30px;
+                            width: 30px;
+                            border-radius: 50%;
+                        }
+                    </style>
+                    <%- include("layout/email-footer") -%>

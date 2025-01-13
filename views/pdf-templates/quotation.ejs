@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    DAT Quotation <%= quotation.quoteNumber %>
+  </title>
+
+  <link rel="stylesheet" type="text/css" hs-webfonts="true"
+    href="https://fonts.googleapis.com/css?family=Lato|Lato:i,b,bi">
+  <meta property="og:title" content="DAT Quotation">
+
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style type="text/css">
+    h2 {
+      font-size: 28px;
+      font-weight: 900;
+      margin: 0;
+      padding: 0;
+    }
+
+    h3 {
+      font-size: 24px;
+      font-weight: 900;
+      margin: 0;
+      padding: 0;
+    }
+
+    h5 {
+      font-size: 18px;
+      font-weight: 900;
+      margin: 0;
+      padding: 0;
+    }
+
+    p,
+    li,
+    td,
+    label {
+      font-size: 14px;
+      margin: 0;
+      padding: 0;
+    }
+
+    .line_items_table td {
+      vertical-align: top;
+    }
+
+    #email {
+      margin: auto;
+      width: 1024px;
+      padding: 15px;
+      background-color: white;
+    }
+
+    #page {
+      margin: auto;
+      width: 991px;
+      max-width: 991px;
+      padding: 30px 50px;
+      min-height: 1204px;
+      background-color: white;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #page .quotation-footer {
+      margin-top: auto;
+      margin-bottom: 0px;
+    }
+
+    .page-header {
+      padding-bottom: 30px;
+      border-bottom: 3px solid black;
+    }
+
+    .header-table {
+      width: 100%;
+    }
+
+    .header-table tr td {
+      vertical-align: center;
+    }
+
+    .line_items_table th,
+    .line_items_table td {
+      padding: 5px 4px;
+      vertical-align: top;
+    }
+
+    #tableHeader,
+    th {
+      border-bottom: 1px solid #7f7f7f;
+      border-top: 1px solid #7f7f7f;
+    }
+
+    .tableFooter {
+      border-bottom: 1px solid #000000;
+      border-top: 1px solid #7f7f7f;
+      padding: 10px 0px;
+    }
+
+    .quotation-information {
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+
+    .table-items p {
+      padding: 4px 0px
+    }
+
+    .text-sm {
+      font-size: 14px;
+    }
+
+    .text-xs {
+      font-size: 12px;
+    }
+
+    .text-base {
+      font-size: 16px;
+    }
+
+    .text-md {
+      font-size: 18px;
+    }
+
+    .text-lg {
+      font-size: 20px;
+    }
+
+    .text-xl {
+      font-size: 24px;
+    }
+
+    .text-2xl {
+      font-size: 28px;
+    }
+
+    .text-3xl {
+      font-size: 40px;
+    }
+
+    .color-primary {
+      color: #137749;
+    }
+
+    .font-light {
+      font-weight: 400;
+    }
+
+    .font-medium {
+      font-weight: 600;
+    }
+
+    .font-bold {
+      font-weight: 900;
+    }
+
+    .color-light {
+      color: #7f7f7f;
+    }
+
+    .color-secondary {
+      color: #e57620;
+    }
+
+    .m-0 {
+      margin: 0px;
+    }
+
+    .mb-0 {
+      margin-bottom: 0px;
+    }
+
+    .mt-0 {
+      margin-top: 0px;
+    }
+
+    .footer-content {
+      margin-top: 15px;
+      padding-top: 10px;
+      border-top: 2px solid black;
+    }
+
+    .footer-content ol {
+      padding: 0px 12px;
+      font-size: 12px;
+      color: #7f7f7f;
+    }
+
+    .footer-content ol li {
+      font-size: 12px;
+    }
+
+    .stamp{
+      position: absolute;
+      top: 30px;
+      left: 50%;
+      max-height: 120px;
+      max-width: 200px;
+      object-fit: contain;
+      transform: translateX(-50%);
+    }
+  </style>
+</head>
+<% var currencyFormatter = new Intl.NumberFormat('en-AE',{
+  style: "currency",
+  currency: "AED",
+  currencyDisplay: 'code'
+}); %>
+<body
+  style="background-color: #F5F8FA; width: 100%; margin: auto 0; padding:0; font-family:Lato, sans-serif; word-break:break-word">
+  <div id="page">
+    <div class="page-header">
+      <table class="header-table">
+        <tr>
+          <td style="width: 40%;">
+            <div>
+              <h3 class="mb-0 color-primary text-xl">
+                <%= submissionBy?.name %>
+              </h3>
+              <h4 class="m-0 color-secondary text-base">DUBAI &nbsp;&nbsp;|&nbsp;&nbsp; ABU DHABI</h4>
+              <p>
+                <%= submissionBy?.address %>
+              </p>
+              <p>Ph: <%= submissionBy?.phoneCode + " " + submissionBy?.phone %>
+              </p>
+              <p>E: <%= submissionBy?.email %>
+              </p>
+              <p class="color-primary" style="text-decoration: underline;">W: www.datconsultancy.com</p>
+              <p class="color-primary" style="text-decoration: underline;">W: www.luxedesign.ae</p>
+              <p>TRN <%= submissionBy?.taxRegistrationNumber %>
+              </p>
+            </div>
+          </td>
+          <td style="width: 30%;">
+            <h2 class="color-primary font-light text-3xl">QUOTATION</h2>
+          </td>
+          <td style="width: 30%;"><img alt="<%= submissionBy?.name %>"
+              src="<%= process.env.IMAGE_CDN_URL + submissionBy?.logo %>" width="150px" align="right"
+              style="padding-right: 20px;"></td>
+        </tr>
+      </table>
+    </div>
+    <div class="quotation-information">
+      <table style="width: 100%;">
+        <tr>
+          <td style="width: 50%; vertical-align: top;">
+            <h3 class="text-md">
+              <%= clientData?.name %>
+            </h3>
+            <p>
+              <%= clientData?.email %>
+            </p>
+          </td>
+          <td style="width: 50%; text-align: right;">
+            <table style="width: 100%;">
+              <tr>
+                <td>Date:</td>
+                <td style="width: 150px;">
+                  <%= convertDate(quotation.issueDate) %>
+                </td>
+              </tr>
+              <tr>
+                <td>Expiry Date:</td>
+                <td style="width: 150px;">
+                  <% if(quotation.expiryDate){ %>
+                    <%= convertDate(quotation.expiryDate) %>
+                      <% } %>
+                </td>
+              </tr>
+              <tr>
+                <td>Quote Number:</td>
+                <td style="width: 150px;">
+                  <%= quotation.quoteNumber %>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="quotation-scope">
+      <table role="presentation" width="100%">
+        <tr>
+          <td align="left">
+            <h3 class="color-primary text-md" style="padding-bottom: 0px; margin-bottom: 0px;">
+              <%= projectType ? projectType?.title : "" %>
+                </h2>
+                <div style="white-space: pre-line;"><%- quotation.scopeOfWork %></div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="line-items-and-total">
+      <!-- Details Breakdown -->
+      <table width="100%" class="line_items_table" style="margin-top: 15px; border-spacing: 0px 2px;" cellspacing="0px">
+        <thead>
+          <tr>
+            <th class="tableHeader color-primary" style="width: 50%;" align="left">Description</th>
+            <th class="tableHeader color-primary" align="center">Quantity</th>
+            <th class="tableHeader color-primary" align="center">Unit Price</th>
+            <th class="tableHeader color-primary" align="right">Amount AED</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% quotation?.QuotationMilestone.forEach((ele)=> { %>
+            <tr>
+              <td style="padding-bottom: 10px;" class="table-items">
+                <div style="white-space: pre-line; line-height: 1.5;"><%= ele.title %></div>
+              </td>
+              <td align="center">
+                <%= (ele.quantity> 0) ? ele.quantity : "" %>
+              </td>
+              <td align="center">
+                <% let milestoneTotal=ele.amount * ele.quantity; %>
+                  <%= (ele.quantity> 0) ? currencyFormatter.format(ele.amount).replace("AED", '') : "" %>
+              </td>
+              <td align="right">
+                <%= (ele.quantity> 0) ? currencyFormatter.format(milestoneTotal).replace("AED", '') : "" %>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="4" style="border-bottom:1px solid #7f7f7f; padding: 0px;"></td>
+            </tr>
+            <% }) %>
+        </tbody>
+
+        <tfoot>
+          <% if(quotation.hasSupervision){ %>
+            <tr>
+              <td class="tableFooter">Supervision (<%= getEnumKeyByEnumValue(SupervisionPaymentSchedule,
+                  quotation.supervisionPaymentSchedule) %>)</td>
+              <td align="right" class="tableFooter"></td>
+              <td align="center" class="tableFooter"></td>
+              <td align="right" class="tableFooter">
+                <%= currencyFormatter.format(quotation.supervisionMonthlyCharge).replace("AED", '') %>
+              </td>
+            </tr>
+            <% } %>
+
+              <tr style="width: 100%;" align="right">
+                <td></td>
+                <td></td>
+                <td style="text-align: left;">Subtotal</td>
+                <td colspan="1">
+                  <%= currencyFormatter.format(quotation.subTotal) %>
+                </td>
+              </tr>
+              <% taxData.forEach(([key, ele])=> { %>
+                <tr style="width: 100%;" align="right">
+                  <td></td>
+                  <td></td>
+                  <td style="text-align: left;">
+                    <%= `${ele.title} (${ele.rate}%)` %>
+                  </td>
+                  <td colspan="1">
+                    <%= currencyFormatter.format(ele.totalTax) %>
+                  </td>
+                </tr>
+                <% }) %>
+                  <tr style="width: 100%;" align="right">
+                    <td></td>
+                    <td></td>
+                    <td
+                      style="font-weight: bold; text-align: left; border-top: 2px solid black; border-bottom: 2px solid black; padding: 5px 0px;">
+                      TOTAL</td>
+                    <td
+                      style="font-weight: bold; border-top: 2px solid black; border-bottom: 2px solid black;padding: 5px 0px;">
+                      <%= currencyFormatter.format(quotation.total) %>
+                    </td>
+                  </tr>
+
+        </tfoot>
+      </table>
+
+      <!--Terms -->
+      <table role="presentation" width="100%" style="margin-top: 50px;">
+        <tr>
+          <td align="left">
+            <h5 class="m-0 text-md">Payment Terms</h2>
+          </td>
+        </tr>
+        <tr>
+          <td align="left" style="white-space: pre-line;"><%= quotation.paymentTerms %></td>
+        </tr>
+      </table>
+    </div>
+    <div class="quotation-footer">
+      <div style="text-align: right; position: relative;">
+        <div>
+          <img src="<%= process.env.IMAGE_CDN_URL + 'public/email-templates/E-signature_Grace-C.jpg' %>" alt="" style="object-fit: contain; height: 100px; width: 135px;" />
+        </div>
+        <h3 class="text-sm font-medium m-0">Grace Salcedo</h3>
+        <h4 class="text-sm font-light m-0">Finance Manager</h4>
+        <p class="text-sm font-light m-0"><%= submissionBy?.name %></p>
+        <% if(submissionBy?.digitalStamp){ %>
+        <img  src="<%= process.env.IMAGE_CDN_URL + submissionBy?.digitalStamp %>" alt="" class="stamp" />
+        <% } %>
+      </div>
+      <div class="footer-content">
+        <h4 class="text-xs m-0 color-light" style="text-decoration: underline;">Payment notes:</h4>
+        <ol class="m-0">
+          <li>D A T Engineering Consultancy can provide supervision services which is not included in this proposal. The
+            supervision services can be added with a separate fee, if required by Client.</li>
+          <li>We shall not be responsible for any delay to the project because of the delay in payments due to us, as the
+            approval process shall be directly linked to the receipt of payments.</li>
+          <li>D A T shall commence the submission process only after the receipt of the Advance Payment.</li>
+          <li>Any third party and government charges are not included in the quoted price and shall be paid by the client
+            as per actual.</li>
+          <li>Any changes or revisions in drawings by the Client/Contractor after obtaining the NOCs from the authorities
+            shall be charged by us separately on the terms to be mutually agreed upon.</li>
+        </ol>
+        <h4 class="text-xs m-0 color-light" style="text-decoration: underline; margin-top: 10px;">General and Other Notes:
+        </h4>
+        <ol class="m-0">
+          <li>This fee proposal is prepared by D A T Engineering Consultancy and shall become effective as a contract from
+            the date of verbal or written confirmation by the client.</li>
+          <li>The Client/Contractor must provide all the necessary drawings and documents prior to start of the process.
+            DAT shall not be responsible for any delay due to delay/non availability of any documents & drawings from the
+            Client.</li>
+          <li>Any other items & approvals which are not mentioned scope of works are not included.</li>
+          <li>Gate pass if required, shall be provided by Client.</li>
+          <li>Our scope of works covers only the regulations related the scope which are in force as on date of this
+            quotation. If there are any changes in the regulations which will affect our scope of works, the relevant
+            terms and conditions shall be discussed and agreed mutually.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

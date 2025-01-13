@@ -1,0 +1,53 @@
+<%- include("layout/email-header") -%>
+<style>
+
+    .message-container {
+        display: block;
+        margin: 10px auto;
+        min-height: 300px;
+        padding: 20px 15px;
+    }
+
+    .otp-block{
+        text-align: center;
+        display: block;
+        font-size: 32px;
+        font-weight: 600;
+        color: rgb(19, 119, 72);
+        letter-spacing: 5px;
+    }
+
+    .text{
+    color: rgba(89, 89, 89, 1);
+    font-size: 14px;
+    margin: 0;
+    line-height: 1.8;
+    font-weight: unset;
+    }
+
+    .text-left{
+        text-align: left;
+    }
+
+    table td, table th{
+        padding-bottom: 1em;
+    }
+
+    .link-button{
+        background-color: rgba(19, 119, 72, 1);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        font-size: small;
+        text-decoration: none;
+    }
+</style>
+<div class="message-wrapper">
+    <div class="message-container">
+        <p class="text">Dear Lead Management Team,</p>
+        <p class="text">Enquiry of client: <b><%= clientData.name %></b> has been confirmed by <%= user?.firstName + " " + user?.lastName %>. Kindly share the quotation to the client to continue the project.</p>
+        <p class="text-center"><a href="<%= frontendDomain+'lead?id='+lead.id %>" class="link-button">View Lead</a></p>
+    </div>
+</div>
+<%- include("layout/email-footer") -%>
