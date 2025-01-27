@@ -198,75 +198,82 @@ export class XeroAccountingService {
     }
  
 
-
-
-    public async getQuotations(page = 1, pageSize = 100, dateFrom?: Date, dateTo?: Date): Promise<XeroQuotation[]> {
+    async getQuotations() {
         const statusMapping: { [key: string]: number } = {
-          "DRAFT": 1,
-          "SUBMITTED": 2,
-          "ACCEPTED": 3,
-          "DECLINED": 4,
+            "DRAFT": 1,
+            "SUBMITTED": 2,
+            "ACCEPTED": 3,
+            "DECLINED": 4,
+            // Add other status values here
         };
     
         const valid = await this.validateAccessToken();
         if (!valid) {
-          this.logger.error("Invalid Access Token");
-          throw new Error("Unable to access Xero: Invalid Access Token");
+            this.logger.error("Invalid Access Token");
+            throw new Error("Unable to access Xero: Invalid Access Token");
         }
     
         const tenantId = this.getDefaultTenantId();
         if (!tenantId) {
-          this.logger.error("No tenant ID found");
-          throw new Error("No tenant ID found");
+            this.logger.error("No tenant ID found");
+            throw new Error("No tenant ID found");
         }
     
         try {
-          // Ensure dateFrom and dateTo are valid Date objects
-          const queryParams: any = {
-            page: page,
-            pageSize: pageSize,
-            // Check if dateFrom and dateTo are provided and valid
-            ...(dateFrom && dateFrom instanceof Date && !isNaN(dateFrom.getTime()) ? { dateFrom: dateFrom.toISOString() } : {}),
-            ...(dateTo && dateTo instanceof Date && !isNaN(dateTo.getTime()) ? { dateTo: dateTo.toISOString() } : {}),
-          };
+            let allQuotations: XeroQuotation[] = [];
+            let currentPage = 1;
+            let hasMorePages = true;
     
-          // Ensure getQuotes method is being called correctly
-          const response = await this.xero.accountingApi.getQuotes(tenantId, queryParams);
+            while (hasMorePages) {
+                const response = await this.xero.accountingApi.getQuotes(tenantId, undefined, undefined, undefined, undefined, undefined, undefined, undefined, currentPage);
+                
+                if (response.body && response.body.quotes && response.body.quotes.length > 0) {
+                    const quotations: XeroQuotation[] = response.body.quotes.map(item => ({
+                        xeroReference: item.quoteID,
+                        quoteNumber: item.quoteNumber,
+                        subTotal: item.subTotal,
+                        total: item.total,
+                        vatAmount: item.totalTax,
+                        expiryDate: item.expiryDate ? new Date(item.expiryDate) : null,
+                        issueDate: item.date ? new Date(item.date) : null,
+                        status: statusMapping[item.status] || 1,
+                        brandingThemeId: item.brandingThemeID ? String(item.brandingThemeID) : null,
+                        paymentTerms: item.terms,
+                        scopeOfWork: item.title,
+                        note: item.summary,
+                    }));
     
-          this.logger.log("Successfully retrieved quotations from Xero");
+                    allQuotations = [...allQuotations, ...quotations];
+                    
+                    // If we got less than 100 results, we've reached the last page
+                    if (response.body.quotes.length < 100) {
+                        hasMorePages = false;
+                    } else {
+                        currentPage++;
+                    }
+                } else {
+                    hasMorePages = false;
+                }
+            }
     
-          if (response.body && response.body.quotes) {
-            const quotations: XeroQuotation[] = response.body.quotes.map(item => ({
-              xeroReference: item.quoteID,
-              quoteNumber: item.quoteNumber,
-              subTotal: item.subTotal,
-              total: item.total,
-              vatAmount: item.totalTax,
-              expiryDate: item.expiryDate ? new Date(item.expiryDate) : null,
-              issueDate: item.date ? new Date(item.date) : null,
-              status: statusMapping[item.status] || 1,
-              brandingThemeId: item.brandingThemeID ? String(item.brandingThemeID) : null,
-              paymentTerms: item.terms,
-              scopeOfWork: item.title,
-              note: item.summary,
-            }));
+            this.logger.log(`Successfully retrieved ${allQuotations.length} quotations from Xero`);
+            
+            if (allQuotations.length > 0) {
+                await this.saveQuotationsToDatabase(allQuotations);
+            } else {
+                this.logger.warn("No quotations found in Xero response.");
+            }
     
-            await this.saveQuotationsToDatabase(quotations);
-            return quotations;
-          } else {
-            this.logger.warn("No quotations found in Xero response.");
-            return [];
-          }
+            return allQuotations;
+    
         } catch (error) {
-          this.logger.error(`Error retrieving quotations from Xero: ${error.message}`, error.stack);
-          throw new Error(`Failed to retrieve quotations: ${error.message}`);
+            this.logger.error(`Error retrieving quotations from Xero: ${error.message}`, error.stack);
+            throw new Error(`Failed to retrieve quotations: ${error.message}`);
         }
-      }
-
+    }
     
     async saveQuotationsToDatabase(quotations: XeroQuotation[]) {
-        // Iterate over each quotation to save or update in the database
-        await Promise.all(quotations.map(async (quotation) => {
+        await BluebirdPromise.map(quotations, async (quotation) => {
             try {
                 // Check if the quotation already exists in the database
                 const existingQuotation = await this.prisma.quotation.findUnique({
@@ -281,13 +288,13 @@ export class XeroAccountingService {
                     vatAmount: quotation.vatAmount,
                     expiryDate: quotation.expiryDate,
                     issueDate: quotation.issueDate,
-                    status: Number(quotation.status), // Save status as a number in the database
-                    brandingThemeId: quotation.brandingThemeId ? Number(quotation.brandingThemeId) : null, // Convert to number if exists
+                    status: Number(quotation.status),
+                    brandingThemeId: quotation.brandingThemeId ? Number(quotation.brandingThemeId) : null,
                     paymentTerms: quotation.paymentTerms,
                     scopeOfWork: quotation.scopeOfWork,
                     note: quotation.note,
-                    modifiedDate: new Date(), // Track modification date
-                    addedDate: existingQuotation ? existingQuotation.addedDate : new Date(), // Retain the original added date if exists
+                    modifiedDate: new Date(),
+                    addedDate: existingQuotation ? existingQuotation.addedDate : new Date(),
                 };
     
                 // Update existing quotation if it exists, otherwise create a new one
@@ -307,7 +314,7 @@ export class XeroAccountingService {
                 this.logger.error(`Error saving quotation: ${quotation.xeroReference} - ${error.message}`, error.stack);
                 throw new Error(`Failed to save quotation ${quotation.xeroReference}: ${error.message}`);
             }
-        }));
+        }, { concurrency: 20 }); // Process 20 quotations at a time
     }
     
     
