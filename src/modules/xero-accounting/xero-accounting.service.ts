@@ -197,7 +197,6 @@ export class XeroAccountingService {
         
     }
  
-
     async getQuotations() {
         const statusMapping: { [key: string]: number } = {
             "DRAFT": 1,
@@ -207,13 +206,19 @@ export class XeroAccountingService {
             // Add other status values here
         };
     
+        this.logger.debug('Starting getQuotations method');
+        
         const valid = await this.validateAccessToken();
+        this.logger.debug('Token validation result:', valid);
+        
         if (!valid) {
             this.logger.error("Invalid Access Token");
             throw new Error("Unable to access Xero: Invalid Access Token");
         }
     
         const tenantId = this.getDefaultTenantId();
+        this.logger.debug('Retrieved tenantId:', tenantId);
+        
         if (!tenantId) {
             this.logger.error("No tenant ID found");
             throw new Error("No tenant ID found");
@@ -225,33 +230,52 @@ export class XeroAccountingService {
             let hasMorePages = true;
     
             while (hasMorePages) {
+                this.logger.debug(`Fetching page ${currentPage} of quotations`);
+                
                 const response = await this.xero.accountingApi.getQuotes(tenantId, undefined, undefined, undefined, undefined, undefined, undefined, undefined, currentPage);
+                this.logger.debug('API Response:', {
+                    status: response?.response?.status,
+                    bodyExists: !!response?.body,
+                    quotesCount: response?.body?.quotes?.length
+                });
                 
                 if (response.body && response.body.quotes && response.body.quotes.length > 0) {
-                    const quotations: XeroQuotation[] = response.body.quotes.map(item => ({
-                        xeroReference: item.quoteID,
-                        quoteNumber: item.quoteNumber,
-                        subTotal: item.subTotal,
-                        total: item.total,
-                        vatAmount: item.totalTax,
-                        expiryDate: item.expiryDate ? new Date(item.expiryDate) : null,
-                        issueDate: item.date ? new Date(item.date) : null,
-                        status: statusMapping[item.status] || 1,
-                        brandingThemeId: item.brandingThemeID ? String(item.brandingThemeID) : null,
-                        paymentTerms: item.terms,
-                        scopeOfWork: item.title,
-                        note: item.summary,
-                    }));
+                    this.logger.debug(`Processing ${response.body.quotes.length} quotes from current page`);
+                    
+                    const quotations: XeroQuotation[] = response.body.quotes.map(item => {
+                        this.logger.debug('Processing quote:', { 
+                            quoteID: item.quoteID,
+                            quoteNumber: item.quoteNumber,
+                            status: item.status 
+                        });
+                        
+                        return {
+                            xeroReference: item.quoteID,
+                            quoteNumber: item.quoteNumber,
+                            subTotal: item.subTotal,
+                            total: item.total,
+                            vatAmount: item.totalTax,
+                            expiryDate: item.expiryDate ? new Date(item.expiryDate) : null,
+                            issueDate: item.date ? new Date(item.date) : null,
+                            status: statusMapping[item.status] || 1,
+                            brandingThemeId: item.brandingThemeID ? String(item.brandingThemeID) : null,
+                            paymentTerms: item.terms,
+                            scopeOfWork: item.title,
+                            note: item.summary,
+                        };
+                    });
     
                     allQuotations = [...allQuotations, ...quotations];
                     
-                    // If we got less than 100 results, we've reached the last page
                     if (response.body.quotes.length < 100) {
+                        this.logger.debug('Last page reached - less than 100 results');
                         hasMorePages = false;
                     } else {
+                        this.logger.debug('Moving to next page');
                         currentPage++;
                     }
                 } else {
+                    this.logger.debug('No quotes found in response, ending pagination');
                     hasMorePages = false;
                 }
             }
@@ -259,6 +283,7 @@ export class XeroAccountingService {
             this.logger.log(`Successfully retrieved ${allQuotations.length} quotations from Xero`);
             
             if (allQuotations.length > 0) {
+                this.logger.debug('Starting database save operation');
                 await this.saveQuotationsToDatabase(allQuotations);
             } else {
                 this.logger.warn("No quotations found in Xero response.");
@@ -267,6 +292,14 @@ export class XeroAccountingService {
             return allQuotations;
     
         } catch (error) {
+            this.logger.error('Detailed error information:', {
+                error: error,
+                message: error?.message,
+                response: error?.response,
+                stack: error?.stack,
+                name: error?.name,
+                code: error?.code
+            });
             this.logger.error(`Error retrieving quotations from Xero: ${error.message}`, error.stack);
             throw new Error(`Failed to retrieve quotations: ${error.message}`);
         }
@@ -1796,7 +1829,7 @@ export class XeroAccountingService {
             activeRecord?.payments.forEach((ele) => {
                 transactions.push({
                     xeroReference: ele.paymentID,
-                    title: "Synced from Xero",
+                    title: "Synced from XERO",
                     transactionDate: new Date(ele.date),
                     amount: ele.amount,
                     status: TransactionStatus.paid,
